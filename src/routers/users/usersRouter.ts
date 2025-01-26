@@ -1,14 +1,11 @@
 import express, { Request, Response } from "express";
 import crypto from "node:crypto";
-import { timeLog } from "../../midlleware";
 import { User } from "../../utils/types";
 
 const router = express.Router({ mergeParams: true });
 
 const users: Record<string, User> = {};
 
-// middleware that is specific to this router
-router.use(timeLog);
 
 // Define routes that should be contained here
 router.get("/", (req, res) => {

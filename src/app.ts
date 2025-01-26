@@ -4,7 +4,7 @@ import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import { debug } from "node:util";
-import { myLogger, requestTime } from "./midlleware";
+import { requestTime } from "./midlleware";
 import { birdRouter, homeRouter, usersRouter } from "./routers";
 import { CustomError } from "./utils/types";
 
@@ -26,16 +26,15 @@ app.use(
     },
   })
 );
-app.use(express.static("public"));
+// app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan("combined"));
 app.use(requestTime);
-app.use(myLogger);
 
+app.use(homeRouter);
 app.use("/birds", birdRouter);
 app.use("/users", usersRouter);
-app.use("/home", homeRouter);
 
 app.use((err, req, res, next) => {
   // Error handling
