@@ -1,12 +1,13 @@
 import compression from "compression";
 import cors from "cors";
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import { Server } from "http";
 import morgan from "morgan";
 import { debug } from "node:util";
-import { requestTime } from "./midlleware";
-import { birdRouter, homeRouter, usersRouter } from "./routers";
+import { yoga, yogaRouter } from "./graphql/yoga";
+import { requestTime } from "./rest/middleware";
+import { birdRouter, homeRouter, usersRouter } from "./rest/routers";
 import { CustomError } from "./utils/types";
 
 const app = express();
@@ -15,7 +16,9 @@ const test = app.get("env") === "test";
 const port = process.env.PORT || 4000;
 
 // middlewares
-app.use(helmet());
+app.use(yoga.graphqlEndpoint, yogaRouter);
+
+app.use(helmet()); // maintain default helmet config
 app.use(cors());
 app.use(
   compression({
@@ -37,18 +40,32 @@ app.use(homeRouter);
 app.use("/birds", birdRouter);
 app.use("/users", usersRouter);
 
-app.use((err, req, res, next) => {
-  // Error handling
-  console.error(err);
-  res.status(500).send({ error: "Something broke" });
-});
+app.use(
+  (
+    err: NodeJS.ErrnoException,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    // Error handling
+    console.error(err);
+    res.status(500).send({ error: "Something broke" });
+  }
+);
 
-app.use((err, req, res, next) => {
-  if (!test) console.error(err.stack);
+app.use(
+  (
+    err: NodeJS.ErrnoException,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    if (!test) console.error(err.stack);
 
-  res.status(err.status || 500);
-  res.send({ error: err.message });
-});
+    res.status(typeof err.code === "number" ? err.code : 500);
+    res.send({ error: err.message });
+  }
+);
 
 app.use((req, res) => {
   // 404 response should remain at the very bottom of the stack
@@ -64,10 +81,11 @@ function error(status: number, message: string): CustomError {
 
 process.on("uncaughtException", (err) => {
   console.error(`${err.name} ${err.message}`);
+  error(0, err.message);
 });
 
 let server: Server;
-if (import.meta.filename !== "app.ts") {
+if (exports.main === module.children) {
   server = app.listen(port, () => {
     console.log(`App listening on port http://localhost:${port}`);
   });
