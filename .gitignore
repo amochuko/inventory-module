@@ -6,3 +6,6 @@
 /report
 /demo
 /http
+
+*.generated.*
+/src/script
