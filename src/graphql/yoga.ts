@@ -6,34 +6,36 @@ import {
 } from "@graphql-yoga/plugin-jwt";
 import { useResponseCache } from "@graphql-yoga/plugin-response-cache";
 import { useCookies } from "@whatwg-node/server-plugin-cookies";
+import express from "express";
 import { GraphQLError } from "graphql";
 import {
   createYoga,
   useExecutionCancellation,
   useReadinessCheck,
 } from "graphql-yoga";
+import helmet from "helmet";
 import { createServer } from "http";
-import { graphQLContext } from "../context/graphqlContext";
+import { graphQLContext } from "./context/graphqlContext";
 import { schema } from "./schema";
 
-// const router = express.Router();
+const router = express.Router();
 
 // configure helmet for `yogo`
-// router.use(
-//   helmet({
-//     contentSecurityPolicy: {
-//       directives: {
-//         "style-src": ["'self'", "unpkg.com"],
-//         "script-src": ["'self'", "unpkg.com", "'unsafe-inline'"],
-//         "img-src": ["'self'", "raw.githubusercontent.com"],
-//       },
-//     },
-//   })
-// );
+router.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        "style-src": ["'self'", "unpkg.com"],
+        "script-src": ["'self'", "unpkg.com", "'unsafe-inline'"],
+        "img-src": ["'self'", "raw.githubusercontent.com"],
+      },
+    },
+  })
+);
 
 // Status: 200 OK  Time: 5.03 s  Size: 149 B
 
-const yoga = createYoga({
+export const yoga = createYoga({
   healthCheckEndpoint: "/live",
   plugins: [
     useJWT({
@@ -90,8 +92,8 @@ const yoga = createYoga({
   } /* Grouped GraphQL requests are allowed within a single HTTP request*/,
 });
 
-// export const yogaRouter = router.use(yoga);
-const yogaServer = createServer(yoga);
-yogaServer.listen(9000, () => {
-  console.log(`Server is running on http://localhost:9000/graphql`);
-});
+export const yogaRouter = router.use(yoga);
+// const yogaServer = createServer(yoga);
+// yogaServer.listen(9000, () => {
+//   console.log(`Server is running on http://localhost:9000/graphql`);
+// });
