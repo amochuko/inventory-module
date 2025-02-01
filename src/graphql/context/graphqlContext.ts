@@ -3,9 +3,8 @@ import { YogaInitialContext } from "graphql-yoga";
 
 export type GraphQLContext = {
   prisma: PrismaClient;
-  xFoo?: string | null;
   apiKey?: string | null;
-  jwt?: string | unknown
+  jwt?: string | null
 };
 
 export async function graphQLContext(
@@ -14,6 +13,5 @@ export async function graphQLContext(
   return {
     prisma: new PrismaClient(),
     apiKey: ctx.request.headers.get("api-key"),
-    xFoo: ctx.request.headers.get("x-foo"),
   };
 }
