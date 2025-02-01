@@ -5,10 +5,10 @@ import helmet from "helmet";
 import { Server } from "http";
 import morgan from "morgan";
 import { debug } from "node:util";
+import { CustomError } from "./common/utils/types";
 import { yoga, yogaRouter } from "./graphql/yoga";
 import { requestTime } from "./rest/middleware";
 import { birdRouter, homeRouter, usersRouter } from "./rest/routers";
-import { CustomError } from "./utils/types";
 
 const app = express();
 app.disable("x-powered-by");
