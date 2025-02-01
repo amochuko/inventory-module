@@ -1,3 +1,4 @@
+import { useGraphQLModules } from "@envelop/graphql-modules";
 import { useCSRFPrevention } from "@graphql-yoga/plugin-csrf-prevention";
 import {
   createInlineSigningKeyProvider,
@@ -14,8 +15,8 @@ import {
   useReadinessCheck,
 } from "graphql-yoga";
 import helmet from "helmet";
-import { createServer } from "http";
 import { graphQLContext } from "./context/graphqlContext";
+import { appModules } from "./modules/appModules";
 import { schema } from "./schema";
 
 const router = express.Router();
@@ -38,6 +39,7 @@ router.use(
 export const yoga = createYoga({
   healthCheckEndpoint: "/live",
   plugins: [
+    useGraphQLModules(appModules),
     useJWT({
       signingKeyProviders: [
         createInlineSigningKeyProvider(process.env.JWT_SECRET ?? "x-10-yex-ht"),
@@ -93,7 +95,3 @@ export const yoga = createYoga({
 });
 
 export const yogaRouter = router.use(yoga);
-// const yogaServer = createServer(yoga);
-// yogaServer.listen(9000, () => {
-//   console.log(`Server is running on http://localhost:9000/graphql`);
-// });
