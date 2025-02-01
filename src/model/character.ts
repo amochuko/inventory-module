@@ -1,4 +1,4 @@
-import { Episode } from "../utils/types";
+import { Episode } from "../common/utils/types";
 
 export default class Character {
   public id: string;
