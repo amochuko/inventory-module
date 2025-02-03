@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { useGraphQLModules } from "@envelop/graphql-modules";
 import { useCSRFPrevention } from "@graphql-yoga/plugin-csrf-prevention";
 import {
@@ -16,13 +17,11 @@ import {
 } from "graphql-yoga";
 import helmet from "helmet";
 import { graphQLContext } from "./context/graphqlContext";
-import { appModules } from "./modules/appModules";
-import { schema } from "./schema";
+import { appModules } from "./modules";
 
 const router = express.Router();
-
-// configure helmet for `yogo`
 router.use(
+  /* configure helmet for `yogo`*/
   helmet({
     contentSecurityPolicy: {
       directives: {
@@ -33,8 +32,6 @@ router.use(
     },
   })
 );
-
-// Status: 200 OK  Time: 5.03 s  Size: 149 B
 
 export const yoga = createYoga({
   healthCheckEndpoint: "/live",
@@ -80,7 +77,6 @@ export const yoga = createYoga({
     useResponseCache({ session: () => null, ttl: 4_000 }),
     useExecutionCancellation(),
   ],
-  schema,
   context: async (ctx) => await graphQLContext(ctx),
   logging: "debug",
   landingPage: false,
