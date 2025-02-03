@@ -1,4 +1,4 @@
-import { AuthService } from "../auth.service";
+import { AuthService } from "../../../../common/services/auth.service";
 import { UserService } from "../user.service";
 
 describe("UserService", () => {

@@ -1,6 +1,6 @@
-import { testkit } from "graphql-modules";
 import "reflect-metadata";
-import { userModule } from "..";
+import { testkit } from "graphql-modules";
+import { userModule } from "../user.module";
 
 describe("userModule", () => {
   it("has QueryType", () => {

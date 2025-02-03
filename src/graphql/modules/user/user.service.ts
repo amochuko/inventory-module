@@ -1,4 +1,4 @@
-import { AuthService } from "./auth.service";
+import { AuthService } from "../../../common/services/auth.service";
 
 export class UserService {
   constructor(public authService: AuthService) {

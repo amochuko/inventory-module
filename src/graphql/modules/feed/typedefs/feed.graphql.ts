@@ -6,9 +6,6 @@ export const FeedSchema = gql`
 
   "The query type, represents all of the entry points into our object graph"
   type Query {
-    # Getting a cookie
-    cookie(name: String): String
-
     "This is the Feed to different websites"
     feed(filterNeedle: String, skip: Int, take: Int): [Feed!]!
 
@@ -23,18 +20,12 @@ export const FeedSchema = gql`
 
     "User type"
     user: User
-
-    "Testing Response Cache"
-    slow: String
   }
 
   """
   The mutation is take state changing function of the schema
   """
   type Mutation {
-    # setting a cookie
-    setCookie(name: String, value: String): String
-
     "This is the function called to create a new feed"
     postFeed(
       "The url of the feed"
@@ -111,9 +102,7 @@ export const FeedSchema = gql`
 
   # cache query operations containing 'User' for 10 seconds
   #   type User @cacheControl(maxAge: 10000) { //TODO: review how to enable @cacheControl
-  type User {
-    id: ID!
-    name: String
+  extend type User {
     bestFriend: User
   }
 

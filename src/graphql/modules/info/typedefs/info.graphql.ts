@@ -2,8 +2,6 @@ import { gql } from "graphql-modules";
 
 export const InfoSchema = gql`
   type Query {
-    hello: String
-
     "Info is of a String scalar"
     info: String!
 
