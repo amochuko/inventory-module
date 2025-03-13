@@ -1,4 +1,6 @@
-import { DataService } from "../data.service";
+// import { DataService } from "../data.service";
+
+import { DataService } from "../data.service.js";
 
 describe("DataService", () => {
   let dataService: DataService;
