@@ -1,11 +1,6 @@
 import express, { Request, Response } from "express";
-import crypto from "node:crypto";
-import { User } from "../../utils/types";
 
 const router = express.Router({ mergeParams: true });
-
-const users: Record<string, User> = {};
-
 
 // Define routes that should be contained here
 router.get("/", (req, res) => {
@@ -29,56 +24,17 @@ router.delete("/user", (req, res) => {
 });
 
 // testing profiler
-router.get("/new-user", (req:Request, res:Response) => {
-  let username = (req.query.username as string) || "";
-  const password = (req.query.password as string) || "";
-
-  username = username.replace(/[!@#$%^&*]/g, "");
-
-  if (!username || !password || users[username]) {
-    return res.sendStatus(400);
+router.get("/new-user", (req: Request, res: Response) => {
+  try {
+    res.status(200).send("New user created");
+  } catch (err) {
+    res.status(500);
   }
-
-  const salt = crypto.randomBytes(128).toString("base64");
-  const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, "sha512");
-
-  users[username] = { salt, hash };
-  console.log({ users });
-
-  res.status(200).send("New user created");
-  
 });
 
 // test profiler (follow up)
 router.get("/auth", (req, res) => {
-  let username = (req.query.username as string) || "";
-  const password = req.query.password || "";
-
-  username = username.replace(/[!@#$%^&*]/g, "");
-
-  if (!username || !password || !users[username]) {
-    return res.sendStatus(400);
-  }
-
-  const { salt, hash } = users[username];
-
-  crypto.pbkdf2(
-    password as string,
-    salt,
-    10000,
-    512,
-    "sha512",
-    (err, derivedKey) => {
-      if (err) {
-        return res.sendStatus(500);
-      }
-      if (crypto.timingSafeEqual(hash, derivedKey)) {
-        res.status(200).send("User authenticated");
-      } else {
-        res.sendStatus(401);
-      }
-    }
-  );
+  res.status(200).send("User authenticated");
 });
 
 export default router;

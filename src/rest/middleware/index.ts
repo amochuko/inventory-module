@@ -1,11 +1,11 @@
- 
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from "express";
 
-
-const requestTime = function (req: Request, res: Response, next: NextFunction) {
+export const requestTime = function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   req.requestTime = Date.now();
 
   next();
 };
-
-export { requestTime };
