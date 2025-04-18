@@ -11,3 +11,6 @@
 /src/script
 coverage/
 /dist
+
+
+/src/graphql/schema.ts
