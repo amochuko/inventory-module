@@ -8,7 +8,6 @@ const PORT = process.env.PORT || 4000;
 
 const server: Server = createServer(yoga);
 server.listen(PORT, () => {
-  console.log(`App listening on port http://localhost:${PORT}`);
   console.info(`Server is running on http://localhost:${PORT}/graphql`);
 });
 
