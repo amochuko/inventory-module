@@ -1,5 +1,5 @@
 import { Injectable } from "graphql-modules";
-import { sql } from "../../../common/database/sqlConnection";
+import { sql } from "../../../config/database/sqlConnection";
 import { Link } from "../../generated-types/graphql";
 import { FeedModule } from "./generated-types/module-types";
 
