@@ -1,27 +1,110 @@
-import "reflect-metadata";
 import { useGraphQLModules } from "@envelop/graphql-modules";
-import { useCSRFPrevention } from "@graphql-yoga/plugin-csrf-prevention";
-import {
-  createInlineSigningKeyProvider,
-  extractFromHeader,
-  useJWT,
-} from "@graphql-yoga/plugin-jwt";
-import { useResponseCache } from "@graphql-yoga/plugin-response-cache";
+import { blockFieldSuggestionsPlugin } from "@escape.tech/graphql-armor-block-field-suggestions";
+import { useDeferStream } from "@graphql-yoga/plugin-defer-stream";
 import { useCookies } from "@whatwg-node/server-plugin-cookies";
 import express from "express";
-import { GraphQLError } from "graphql";
 import {
+  createLogger,
   createYoga,
   useExecutionCancellation,
+  useExtendContext,
   useReadinessCheck,
 } from "graphql-yoga";
 import helmet from "helmet";
-import { graphQLContext } from "./context/graphqlContext";
-import { appModules } from "./modules";
+import { createContext } from "./context/custom-gql-context";
+import { application } from "./modules/app";
 
-const router = express.Router();
-router.use(
-  /* configure helmet for `yogo`*/
+const logger = createLogger("debug");
+
+const yoga = createYoga({
+  landingPage: ({ url, fetchAPI }) => {
+    return new fetchAPI.Response(
+      /* HTML */ `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>404 Not Found</title>
+          </head>
+          <body>
+            <h1>404 Not Found</h1>
+            <p>
+              Sorry, the page (${url.pathname}) you are looking for could not be
+              found.
+            </p>
+          </body>
+        </html>
+      `,
+      {
+        status: 404,
+        headers: {
+          "Content-Type": "text/html",
+        },
+      }
+    );
+  },
+  plugins: [
+    useCookies(),
+    // useCSRFPrevention(),
+    // useJWT({
+    // signingKeyProviders: [createInlineSigningKeyProvider(envs.JWT_SECRET)],
+    // tokenLookupLocations: [
+    //   extractFromHeader({ name: "authorization", prefix: "Bearer" }),
+    // ],
+    // tokenVerification: {
+    //   issuer: "get the user from db",
+    //   audience: "pick audience",
+    //   algorithms: ["HS256", "RS256"],
+    // },
+    // extendContext: true,
+    // reject: {
+    //   missingToken: true,
+    //   invalidToken: true,
+    // },
+    // }),
+    useReadinessCheck({
+      endpoint: "/ready",
+      check: async () => {
+        try {
+          // await checkDatabaseService(); // check with connection
+          return true;
+        } catch (err) {
+          console.error(err);
+
+          return false;
+        }
+      },
+    }),
+    useExecutionCancellation(),
+    blockFieldSuggestionsPlugin(),
+    useDeferStream(),
+    useGraphQLModules(application),
+    useExtendContext((ctx) => {
+      return {
+        ...ctx,
+        ...createContext(ctx),
+      };
+    }),
+    // useResponseCache({
+    //TODO: Revisit the useResponseCache config
+    //   session(request, context) {
+    //     return null;
+    //   },
+    // }),
+  ],
+  context: createContext,
+  logging: logger,
+  batching: true,
+  cors: {
+    origin: "http:localhost:3000",
+    credentials: true,
+    allowedHeaders: ["x-custom-header"],
+    methods: ["POST"],
+  },
+});
+
+const yogaRouter = express.Router();
+
+yogaRouter.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
@@ -33,61 +116,6 @@ router.use(
   })
 );
 
-export const yoga = createYoga({
-  healthCheckEndpoint: "/live",
-  plugins: [
-    useGraphQLModules(appModules),
-    useJWT({
-      signingKeyProviders: [
-        createInlineSigningKeyProvider(process.env.JWT_SECRET ?? "x-10-yex-ht"),
-      ],
-      tokenLookupLocations: [
-        extractFromHeader({ name: "authorization", prefix: "Bearer" }),
-      ],
-      tokenVerification: {
-        algorithms: ["ES256", "RS256"],
-        audience: process.env.JWT_AUDIENCE,
-        issuer: "me20283",
-      },
-      extendContext: true,
-      reject: {
-        missingToken: false,
-        invalidToken: false,
-      },
-    }),
-    useCookies(),
-    useReadinessCheck({
-      /* Health check if other required service are ready to go */
-      endpoint: "/ready",
-      check: async () => {
-        try {
-          // if resolves, respond with 200 OK
-          // await checkDbAvailable();
+yogaRouter.use(yoga);
 
-          throw new Error("Service not available!");
-        } catch (err) {
-          console.error(err);
-          throw new GraphQLError(
-            err instanceof Error ? err.message : "Service Unavailable!"
-          );
-        }
-      },
-    }),
-    useCSRFPrevention({ requestHeaders: ["x-culb-csrf"] }),
-    useResponseCache({ session: () => null, ttl: 4_000 }),
-    useExecutionCancellation(),
-  ],
-  context: async (ctx) => await graphQLContext(ctx),
-  logging: "debug",
-  landingPage: false,
-  cors: {
-    credentials: true,
-    methods: ["POST"],
-    origin: "http://localhost:4000",
-  },
-  batching: {
-    limit: 5,
-  } /* Grouped GraphQL requests are allowed within a single HTTP request*/,
-});
-
-export const yogaRouter = router.use(yoga);
+export { yoga, yogaRouter };
