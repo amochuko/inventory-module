@@ -3,50 +3,52 @@ import * as Types from "../../../generated-types/graphql";
 import * as gm from "graphql-modules";
 export namespace FeedModule {
   interface DefinedFields {
-    Query: 'feed' | 'comment' | 'hero' | 'user';
-    Mutation: 'postFeed' | 'postCommentOnFeed';
-    Character: 'id' | 'name' | 'age' | 'episode' | 'createdAt' | 'updatedAt';
-    Comment: 'id' | 'createdAt' | 'updatedAt' | 'body' | 'feed';
-    Feed: 'id' | 'description' | 'url' | 'comments' | 'createdAt' | 'updatedAt';
-    Subscription: 'countdown';
-    User: 'bestFriend';
-    Node: 'id';
-    Dates: 'createdAt' | 'updatedAt';
+    Query: 'feed' | 'link' | 'comment';
+    Mutation: 'postLink' | 'updateLink' | 'postCommentOnLink';
+    Link: 'feed_id' | 'url' | 'description' | 'comments' | 'created_at' | 'updated_at';
+    Comment: 'id' | 'body' | 'link' | 'created_at' | 'updated_at';
+    PostCommentOnLinkMutationResponse: 'code' | 'success' | 'message' | 'comment';
+    UpdateLinkMutationResponse: 'code' | 'success' | 'message' | 'link';
+    CommonType: 'id' | 'created_at' | 'updated_at';
+    MutationResponse: 'code' | 'success' | 'message';
   };
   
-  interface DefinedEnumValues {
-    Episode: 'NEWHOPE' | 'EMPIRE' | 'JEDI';
+  interface DefinedInputFields {
+    FeedInputArgs: 'filterNeedle' | 'skip' | 'take';
+    FeedUpdateInputArgs: 'url' | 'description';
   };
   
   export type Query = Pick<Types.Query, DefinedFields['Query']>;
-  export type Feed = Pick<Types.Feed, DefinedFields['Feed']>;
+  export type Link = Pick<Types.Link, DefinedFields['Link']>;
+  export type FeedInputArgs = Pick<Types.FeedInputArgs, DefinedInputFields['FeedInputArgs']>;
   export type Comment = Pick<Types.Comment, DefinedFields['Comment']>;
-  export type Character = Pick<Types.Character, DefinedFields['Character']>;
-  export type Episode = DefinedEnumValues['Episode'];
-  export type User = Types.User;
   export type Mutation = Pick<Types.Mutation, DefinedFields['Mutation']>;
-  export type Node = Pick<Types.Node, DefinedFields['Node']>;
-  export type Dates = Pick<Types.Dates, DefinedFields['Dates']>;
-  export type Subscription = Pick<Types.Subscription, DefinedFields['Subscription']>;
+  export type UpdateLinkMutationResponse = Pick<Types.UpdateLinkMutationResponse, DefinedFields['UpdateLinkMutationResponse']>;
+  export type FeedUpdateInputArgs = Pick<Types.FeedUpdateInputArgs, DefinedInputFields['FeedUpdateInputArgs']>;
+  export type PostCommentOnLinkMutationResponse = Pick<Types.PostCommentOnLinkMutationResponse, DefinedFields['PostCommentOnLinkMutationResponse']>;
+  export type CommonType = Pick<Types.CommonType, DefinedFields['CommonType']>;
+  export type MutationResponse = Pick<Types.MutationResponse, DefinedFields['MutationResponse']>;
+  
+  export type Scalars = Pick<Types.Scalars, 'Date'>;
+  export type DateScalarConfig = Types.DateScalarConfig;
   
   export type QueryResolvers = Pick<Types.QueryResolvers, DefinedFields['Query']>;
   export type MutationResolvers = Pick<Types.MutationResolvers, DefinedFields['Mutation']>;
-  export type CharacterResolvers = Pick<Types.CharacterResolvers, DefinedFields['Character'] | '__isTypeOf'>;
+  export type LinkResolvers = Pick<Types.LinkResolvers, DefinedFields['Link'] | '__isTypeOf'>;
   export type CommentResolvers = Pick<Types.CommentResolvers, DefinedFields['Comment'] | '__isTypeOf'>;
-  export type FeedResolvers = Pick<Types.FeedResolvers, DefinedFields['Feed'] | '__isTypeOf'>;
-  export type SubscriptionResolvers = Pick<Types.SubscriptionResolvers, DefinedFields['Subscription']>;
-  export type UserResolvers = Pick<Types.UserResolvers, DefinedFields['User']>;
-  export type NodeResolvers = Pick<Types.NodeResolvers, DefinedFields['Node']>;
-  export type DatesResolvers = Pick<Types.DatesResolvers, DefinedFields['Dates']>;
+  export type PostCommentOnLinkMutationResponseResolvers = Pick<Types.PostCommentOnLinkMutationResponseResolvers, DefinedFields['PostCommentOnLinkMutationResponse'] | '__isTypeOf'>;
+  export type UpdateLinkMutationResponseResolvers = Pick<Types.UpdateLinkMutationResponseResolvers, DefinedFields['UpdateLinkMutationResponse'] | '__isTypeOf'>;
+  export type CommonTypeResolvers = Pick<Types.CommonTypeResolvers, DefinedFields['CommonType']>;
+  export type MutationResponseResolvers = Pick<Types.MutationResponseResolvers, DefinedFields['MutationResponse']>;
   
   export interface Resolvers {
     Query?: QueryResolvers;
     Mutation?: MutationResolvers;
-    Character?: CharacterResolvers;
+    Link?: LinkResolvers;
     Comment?: CommentResolvers;
-    Feed?: FeedResolvers;
-    Subscription?: SubscriptionResolvers;
-    User?: UserResolvers;
+    PostCommentOnLinkMutationResponse?: PostCommentOnLinkMutationResponseResolvers;
+    UpdateLinkMutationResponse?: UpdateLinkMutationResponseResolvers;
+    Date?: Types.Resolvers['Date'];
   };
   
   export interface MiddlewareMap {
@@ -56,48 +58,45 @@ export namespace FeedModule {
     Query?: {
       '*'?: gm.Middleware[];
       feed?: gm.Middleware[];
+      link?: gm.Middleware[];
       comment?: gm.Middleware[];
-      hero?: gm.Middleware[];
-      user?: gm.Middleware[];
     };
     Mutation?: {
       '*'?: gm.Middleware[];
-      postFeed?: gm.Middleware[];
-      postCommentOnFeed?: gm.Middleware[];
+      postLink?: gm.Middleware[];
+      updateLink?: gm.Middleware[];
+      postCommentOnLink?: gm.Middleware[];
     };
-    Character?: {
+    Link?: {
       '*'?: gm.Middleware[];
-      id?: gm.Middleware[];
-      name?: gm.Middleware[];
-      age?: gm.Middleware[];
-      episode?: gm.Middleware[];
-      createdAt?: gm.Middleware[];
-      updatedAt?: gm.Middleware[];
+      feed_id?: gm.Middleware[];
+      url?: gm.Middleware[];
+      description?: gm.Middleware[];
+      comments?: gm.Middleware[];
+      created_at?: gm.Middleware[];
+      updated_at?: gm.Middleware[];
     };
     Comment?: {
       '*'?: gm.Middleware[];
       id?: gm.Middleware[];
-      createdAt?: gm.Middleware[];
-      updatedAt?: gm.Middleware[];
       body?: gm.Middleware[];
-      feed?: gm.Middleware[];
+      link?: gm.Middleware[];
+      created_at?: gm.Middleware[];
+      updated_at?: gm.Middleware[];
     };
-    Feed?: {
+    PostCommentOnLinkMutationResponse?: {
       '*'?: gm.Middleware[];
-      id?: gm.Middleware[];
-      description?: gm.Middleware[];
-      url?: gm.Middleware[];
-      comments?: gm.Middleware[];
-      createdAt?: gm.Middleware[];
-      updatedAt?: gm.Middleware[];
+      code?: gm.Middleware[];
+      success?: gm.Middleware[];
+      message?: gm.Middleware[];
+      comment?: gm.Middleware[];
     };
-    User?: {
+    UpdateLinkMutationResponse?: {
       '*'?: gm.Middleware[];
-      bestFriend?: gm.Middleware[];
-    };
-    Subscription?: {
-      '*'?: gm.Middleware[];
-      countdown?: gm.Middleware[];
+      code?: gm.Middleware[];
+      success?: gm.Middleware[];
+      message?: gm.Middleware[];
+      link?: gm.Middleware[];
     };
   };
 }

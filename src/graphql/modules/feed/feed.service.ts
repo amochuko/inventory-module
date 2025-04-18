@@ -1,83 +1,28 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-import { GraphQLError } from "graphql";
 import { Injectable } from "graphql-modules";
-import { applyTakeConstraints } from "../../../common/utils/helpers";
-import { InputMaybe } from "../../generated-types/graphql";
+import { Link } from "../../generated-types/graphql";
+import FeedDAO from "./feed.dao";
 
 @Injectable()
 export class FeedService {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private feedDAO: FeedDAO) {}
 
-  async feeds() {
-    return await this.prisma.feed.findMany();
-  }
-  async feed(
-    filterNeedle?: InputMaybe<string> | undefined,
-    skip?: number |undefined,
-    take?: number|undefined
-  ) {
-    return await this.prisma.feed.findMany({
-      where: filterNeedle
-        ? {
-            OR: [
-              { description: { contains: filterNeedle } },
-              { url: { contains: filterNeedle } },
-            ],
-          }
-        : {},
-      skip,
-      take: applyTakeConstraints({
-        min: 1,
-        max: 50,
-        value: take ?? 30,
-      }),
-    });
-  }
-  async getFeedById(id: number) {
-    return await this.prisma.feed.findFirst({
-      where: { id },
-    });
+  async create(args: Pick<Link, "url" | "description">): Promise<Link> {
+    return await this.feedDAO.create(args);
   }
 
-  async create(description: string, url: string) {
-    return await this.prisma.feed.create({
-      data: { description, url },
-    });
-  }
-  async commentsOnFeedID(feedID: number) {
-    return await this.prisma.comment.findMany({
-      where: { feedID },
-      orderBy: { createdAt: "desc" },
-    });
+  async getAll(): Promise<Link[] | []> {
+    return await this.feedDAO.getAll();
   }
 
-  async commentById(id: number) {
-    return await this.prisma.comment.findFirst({
-      where: { id },
-    });
+  async getById(id: string): Promise<Link | undefined> {
+    return await this.feedDAO.getById({ feed_id: id });
   }
 
-  async addComment(body: string, feedID: number) {
-    return await this.prisma.comment
-      .create({
-        data: {
-          body,
-          feedID,
-          createdAt: new Date(),
-        },
-      })
-      .catch((err: unknown) => {
-        if (
-          err instanceof Prisma.PrismaClientKnownRequestError &&
-          err.code === "P2003"
-        ) {
-          return Promise.reject(
-            new GraphQLError(
-              `Cannot post comment on non-existing feed with id '${feedID}'`
-            )
-          );
-        }
-        return Promise.reject(err);
-      });
+  async updateById(id: string, link: Partial<Link>) {
+    return await this.feedDAO.updateById({ feed_id: id, feed: link });
+  }
+
+  async deleteById(id: string): Promise<"Ok" | string> {
+    return await this.feedDAO.deleteById({ feed_id: id });
   }
 }
