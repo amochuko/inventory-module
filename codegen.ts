@@ -1,7 +1,7 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema: "./src/graphql/modules/**/typedefs/*.graphql.ts",
+  schema: "./src/graphql/modules/**/typedefs/*.schema.ts",
   generates: {
     "./src/graphql/modules/": {
       preset: "graphql-modules",
@@ -19,7 +19,7 @@ const config: CodegenConfig = {
         "typescript-resolvers",
       ],
       config: {
-        contextType: "../context/graphqlContext#GraphQLContext",
+        contextType: "../context/custom-gql-context#CustomGQLContext",
       },
     },
   },
