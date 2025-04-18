@@ -3,9 +3,9 @@ import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
-import { CustomError } from "./common/utils/types";
-import { requestTime } from "./rest/middleware";
-import { birdRouter, homeRouter, usersRouter } from "./rest/routers";
+import { CustomError } from "../common/utils/types";
+import { requestTime } from "./middleware";
+import { birdRouter, homeRouter, usersRouter } from "./routers";
 
 class App {
   public app: Application;
