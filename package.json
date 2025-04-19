@@ -1,7 +1,7 @@
 {
-  "name": "express",
+  "name": "inventory",
   "version": "1.0.0",
-  "description": "A demo api server",
+  "description": "A suit of inventory modules for small businesses",
   "main": "src/main.ts",
   "scripts": {
     "clean": "rm -rf ./dist",
