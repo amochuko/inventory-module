@@ -1,7 +1,7 @@
 import { Injectable } from "graphql-modules";
 import { createLogger } from "graphql-yoga";
 import { sql } from "../../../config/database/sqlConnection";
-import { Category } from "../../generated-types/graphql";
+import { Category, FilterCategoryInput } from "../../generated-types/graphql";
 import { CategoryCreationError, CategoryFindAllError } from "./category.error";
 import { ICategory } from "./category.interface";
 
@@ -9,23 +9,45 @@ const logger = createLogger("error");
 
 @Injectable()
 export default class CategoryDAO implements ICategory {
+  //
+  async findAll(args?: FilterCategoryInput): Promise<Category[]> {
+    try {
+      const res = await sql({
+        query: `SELECT * FROM inventory.categories
+        
+        ORDER BY id ASC`,
+        params: [],
+      });
+
+      return res.rows;
+    } catch (err) {
+      if (err instanceof Error) {
+        throw err.message;
+      }
+
+      throw new CategoryFindAllError();
+    }
+  }
+
   findById(id: string): Promise<Category> {
     throw new Error("Method not implemented.");
   }
+
   updateById(id: string, body: Partial<Category>): Promise<Category> {
     throw new Error("Method not implemented.");
   }
+
   deleteById(id: string): Promise<Boolean> {
     throw new Error("Method not implemented.");
   }
 
   async create(
-    args: Pick<Category, "abbrevCode" | "name" | "description">
+    args: Pick<Category, "abbrev_code" | "name" | "description">
   ): Promise<Category> {
     try {
       const result = await sql({
         query: `INSERT INTO inventory.categories (name, abbrev_code, description) VALUES ($1, $2, $3) RETURNING *;`,
-        params: [args.name, args.abbrevCode, args.description],
+        params: [args.name, args.abbrev_code, args.description],
       });
 
       if (!result.rowCount) {
@@ -47,24 +69,6 @@ export default class CategoryDAO implements ICategory {
 
       logger.error(CategoryDAO.name, err);
       throw new CategoryCreationError(err);
-    }
-  }
-
-  async findAll(): Promise<Category[]> {
-    try {
-      const res = await sql({
-        query: `SELECT * FROM inventory.categories
-        ORDER BY id ASC`,
-        params: [],
-      });
-
-      return res.rows;
-    } catch (err) {
-      if (err instanceof Error) {
-        throw err.message;
-      }
-
-      throw new CategoryFindAllError();
     }
   }
 }
