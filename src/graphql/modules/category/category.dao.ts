@@ -2,10 +2,15 @@ import { Injectable } from "graphql-modules";
 import { createLogger } from "graphql-yoga";
 import { sql } from "../../../config/database/sqlConnection";
 import { Category, FilterCategoryInput } from "../../generated-types/graphql";
-import { CategoryCreationError, CategoryFindAllError } from "./category.error";
+import {
+  CategoryCreationError,
+  CategoryFindAllError,
+  CategoryNotFoundError,
+} from "./category.error";
 import { ICategory } from "./category.interface";
 
 const logger = createLogger("error");
+const categories = "inventory.categories";
 
 @Injectable()
 export default class CategoryDAO implements ICategory {
@@ -51,8 +56,19 @@ export default class CategoryDAO implements ICategory {
     }
   }
 
-  findById(id: string): Promise<Category> {
-    throw new Error("Method not implemented.");
+  async findById(id: string): Promise<Category> {
+    try {
+      const result = await sql({
+        query: `SELECT * FROM inventory.categories
+        WHERE id = ($1)`,
+        params: [id],
+      });
+
+      return result.rows[0];
+    } catch (err) {
+      logger.error(err);
+      throw new CategoryNotFoundError();
+    }
   }
 
   updateById(id: string, body: Partial<Category>): Promise<Category> {
