@@ -35,3 +35,18 @@ export function getAbbrevationCodeFromName(name: string) {
         name.length
     : name.substring(0, 3).toUpperCase() + "-" + name.length;
 }
+
+export function generateStockKeepingUnit(
+  categoryCode: string,
+  productName: string,
+  productId: string
+): string {
+  const abbrev = productName
+    .replace(/[^A-Za-z0-9]/g, "") // remove special chars
+    .substring(0, 5)
+    .toUpperCase();
+
+  const paddedId = productId.substring(0, 3).padStart(3, "0");
+
+  return `${categoryCode}-${abbrev}-${paddedId}`;
+}
