@@ -1,15 +1,11 @@
-import { Category } from "../../generated-types/graphql";
+import { Category, CreateCategoryInput, FilterCategoryInput } from "../../generated-types/graphql";
 
-type CreateArgs = Pick<Category, "abbrevCode" | "name" | "description">;
-type FilterOption = {
-  filterBy: string;
-  skip: number;
-  take: number;
-};
+ 
+
 export interface ICategory {
-  create(args: CreateArgs): Promise<Category>;
+  create(args: CreateCategoryInput): Promise<Category>;
 
-  findAll(args?: FilterOption): Promise<Category[]>;
+  findAll(args?: FilterCategoryInput): Promise<Category[]>;
 
   findById(id: string): Promise<Category>;
 
