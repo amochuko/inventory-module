@@ -8,9 +8,14 @@ const logger = createLogger("debug");
 
 export const categoryResolvers: CategoryModule.Resolvers = {
   Query: {
-    categories: async (_, args, ctx) => {
-      logger.info("resolving categories");
-      return await ctx.injector.get(CategoryService).findAll();
+    categories: async (_, { filter }, ctx) => {
+      logger.info("resolving categories with");
+
+      return await ctx.injector.get(CategoryService).findAll({
+        filterByName: filter?.filterByName,
+        skip: filter?.skip,
+        take: filter?.take,
+      });
     },
   },
   Mutation: {
