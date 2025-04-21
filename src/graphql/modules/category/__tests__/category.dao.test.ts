@@ -8,12 +8,22 @@ jest.mock("../../../../config/database/sqlConnection", () => ({
 const mockCategories = [
   {
     name: "Electronics",
-    abbrev_code: "ELE",
+    abbrev_code: "ELE-11",
     description: "Tech",
   },
   {
     name: "Food",
-    abbrev_code: "FOD",
+    abbrev_code: "FOD-4",
+    description: "Feed house",
+  },
+  {
+    name: "Food and Games",
+    abbrev_code: "FOD-14",
+    description: "Feed house",
+  },
+  {
+    name: "Food and Hunt",
+    abbrev_code: "FOD-13",
     description: "Feed house",
   },
 ];
@@ -21,45 +31,66 @@ const mockCategories = [
 describe("CategoryDAO", () => {
   const dao = new CategoryDAO();
 
-  it("should create a category successfully", async () => {
-    (sql as jest.Mock).mockReturnValue({
-      rowCount: 1,
-      rows: mockCategories,
+  describe("create", async () => {
+    it("should create a category successfully", async () => {
+      (sql as jest.Mock).mockReturnValue({
+        rowCount: 1,
+        rows: mockCategories,
+      });
+
+      const result = await dao.create({
+        abbrev_code: "ELE",
+        description: "TECH",
+        name: "Electronic",
+      });
+
+      expect(result).toEqual(mockCategories[0]);
     });
 
-    const result = await dao.create({
-      abbrev_code: "ELE",
-      description: "TECH",
-      name: "Electronic",
+    it("should throw a creation error if insert fails", async () => {
+      (sql as jest.Mock).mockReturnValue({ rowCount: 0, rows: [] });
+
+      await expect(
+        dao.create({ name: "Fail", abbrev_code: "FAIL", description: "none" })
+      ).rejects.toThrow("Failed to create category");
     });
 
-    expect(result).toEqual(mockCategories[0]);
+    it("should detect duplicate constraint violation", async () => {
+      (sql as jest.Mock).mockRejectedValue(
+        new Error(
+          'duplicate key value violates unique constraint "categories_name_key"'
+        )
+      );
+
+      await expect(
+        dao.create({
+          name: "Duplicate",
+          abbrev_code: "DUP",
+          description: "Copy",
+        })
+      ).rejects.toThrow("Category name already exists");
+    });
   });
 
-  it("should throw a creation error if insert fails", async () => {
-    (sql as jest.Mock).mockReturnValue({ rowCount: 0, rows: [] });
+  describe("findAll", () => {
+    it("should return categories", async () => {
+      (sql as jest.Mock).mockResolvedValue({
+        rowCount: 2,
+        rows: mockCategories,
+      });
 
-    await expect(
-      dao.create({ name: "Fail", abbrev_code: "FAIL", description: "none" })
-    ).rejects.toThrow("Failed to create category");
-  });
+      const res = await dao.findAll();
+      expect(mockCategories).toEqual(res);
+    });
 
-  it("should detect duplicate constraint violation", async () => {
-    (sql as jest.Mock).mockRejectedValue(
-      new Error(
-        'duplicate key value violates unique constraint "categories_name_key"'
-      )
-    );
+    it("should return categories with filter", async () => {
+      (sql as jest.Mock).mockResolvedValue({
+        rowCount: 2,
+        rows: mockCategories.slice(2),
+      });
 
-    await expect(
-      dao.create({ name: "Duplicate", abbrev_code: "DUP", description: "Copy" })
-    ).rejects.toThrow("Category name already exists");
-  });
-
-  it("should return categories with .findAll()", async () => {
-    (sql as jest.Mock).mockResolvedValue({ rowCount: 2, rows: mockCategories });
-
-    const res = await dao.findAll();
-    expect(mockCategories).toEqual(res);
+      const res = await dao.findAll({ filterByName: "food", skip: 0, take: 4 });
+      expect(res).toEqual(mockCategories.slice(2));
+    });
   });
 });
