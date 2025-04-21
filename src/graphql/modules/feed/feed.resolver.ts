@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 import { createLogger } from "graphql-yoga";
 import { parseIntSafe } from "../../../common/utils/helpers";
-import { DateScalar } from "../types/scalar";
+import { DateScalar } from "../../types/custom-scalar";
 import { FeedService } from "./feed.service";
 import { FeedModule } from "./generated-types/module-types";
 
@@ -14,14 +14,14 @@ const links: FeedModule.Link[] = [
     description:
       "GraphQL Code Generator is a plugin-based tool that helps you get the best out of your GraphQL stack. From back-end to front-end, GraphQL Code.",
     comments: [],
-    created_at: new Date(),
+    createdAt: new Date(),
   },
   {
     feed_id: "1012",
     description: "Generator automates the generation of the hello links",
     url: "https://example.com",
     comments: [],
-    created_at: new Date(),
+    createdAt: new Date(),
   },
 ];
 
@@ -32,13 +32,13 @@ const comments: FeedModule.Comment[] = [
     id: "1234",
     body: "String of the body hello",
     link: links[0],
-    created_at: date,
+    createdAt: date,
   },
   {
     id: "4567",
     body: "hello",
     link: links[1],
-    created_at: date,
+    createdAt: date,
   },
 ];
 
@@ -109,7 +109,7 @@ export const feedResolvers: FeedModule.Resolvers = {
         }
 
         return {
-          code: "200",
+          code: 200,
           message: "Successful update!",
           success: true,
           link: res,
@@ -118,7 +118,7 @@ export const feedResolvers: FeedModule.Resolvers = {
         console.error(err);
 
         return {
-          code: "201",
+          code: 201,
           message: `Unsuccessful update ${err}`,
           success: false,
           link: null,
@@ -140,7 +140,7 @@ export const feedResolvers: FeedModule.Resolvers = {
       const comment: FeedModule.Comment = {
         body: String(args.body),
         link: link!,
-        created_at: date,
+        createdAt: date,
         id: "",
       };
 
@@ -148,7 +148,7 @@ export const feedResolvers: FeedModule.Resolvers = {
       comments.push(comment);
 
       return {
-        code: "200",
+        code: 200,
         comment: comment,
         message: "post successful",
         success: true,
@@ -159,7 +159,7 @@ export const feedResolvers: FeedModule.Resolvers = {
     feed_id: (parent) => parent.feed_id,
     description: (parent) => parent.description,
     url: (parent) => parent.url,
-    created_at: (parent) => parent.created_at,
+    createdAt: (parent) => parent.createdAt,
     comments: (parent, args, ctx) => {
       return comments;
     },

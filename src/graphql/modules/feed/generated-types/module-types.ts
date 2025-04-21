@@ -5,12 +5,11 @@ export namespace FeedModule {
   interface DefinedFields {
     Query: 'feed' | 'link' | 'comment';
     Mutation: 'postLink' | 'updateLink' | 'postCommentOnLink';
-    Link: 'feed_id' | 'url' | 'description' | 'comments' | 'created_at' | 'updated_at';
-    Comment: 'id' | 'body' | 'link' | 'created_at' | 'updated_at';
+    Link: 'feed_id' | 'url' | 'description' | 'comments' | 'createdAt' | 'updatedAt';
+    Comment: 'id' | 'body' | 'link' | 'createdAt' | 'updatedAt';
     PostCommentOnLinkMutationResponse: 'code' | 'success' | 'message' | 'comment';
     UpdateLinkMutationResponse: 'code' | 'success' | 'message' | 'link';
-    CommonType: 'id' | 'created_at' | 'updated_at';
-    MutationResponse: 'code' | 'success' | 'message';
+    CommonType: 'id' | 'createdAt' | 'updatedAt';
   };
   
   interface DefinedInputFields {
@@ -27,7 +26,7 @@ export namespace FeedModule {
   export type FeedUpdateInputArgs = Pick<Types.FeedUpdateInputArgs, DefinedInputFields['FeedUpdateInputArgs']>;
   export type PostCommentOnLinkMutationResponse = Pick<Types.PostCommentOnLinkMutationResponse, DefinedFields['PostCommentOnLinkMutationResponse']>;
   export type CommonType = Pick<Types.CommonType, DefinedFields['CommonType']>;
-  export type MutationResponse = Pick<Types.MutationResponse, DefinedFields['MutationResponse']>;
+  export type MutationResponse = Types.MutationResponse;
   
   export type Scalars = Pick<Types.Scalars, 'Date'>;
   export type DateScalarConfig = Types.DateScalarConfig;
@@ -39,7 +38,6 @@ export namespace FeedModule {
   export type PostCommentOnLinkMutationResponseResolvers = Pick<Types.PostCommentOnLinkMutationResponseResolvers, DefinedFields['PostCommentOnLinkMutationResponse'] | '__isTypeOf'>;
   export type UpdateLinkMutationResponseResolvers = Pick<Types.UpdateLinkMutationResponseResolvers, DefinedFields['UpdateLinkMutationResponse'] | '__isTypeOf'>;
   export type CommonTypeResolvers = Pick<Types.CommonTypeResolvers, DefinedFields['CommonType']>;
-  export type MutationResponseResolvers = Pick<Types.MutationResponseResolvers, DefinedFields['MutationResponse']>;
   
   export interface Resolvers {
     Query?: QueryResolvers;
@@ -73,16 +71,16 @@ export namespace FeedModule {
       url?: gm.Middleware[];
       description?: gm.Middleware[];
       comments?: gm.Middleware[];
-      created_at?: gm.Middleware[];
-      updated_at?: gm.Middleware[];
+      createdAt?: gm.Middleware[];
+      updatedAt?: gm.Middleware[];
     };
     Comment?: {
       '*'?: gm.Middleware[];
       id?: gm.Middleware[];
       body?: gm.Middleware[];
       link?: gm.Middleware[];
-      created_at?: gm.Middleware[];
-      updated_at?: gm.Middleware[];
+      createdAt?: gm.Middleware[];
+      updatedAt?: gm.Middleware[];
     };
     PostCommentOnLinkMutationResponse?: {
       '*'?: gm.Middleware[];
