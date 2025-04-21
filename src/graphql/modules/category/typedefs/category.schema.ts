@@ -4,15 +4,17 @@ export const categorySchema = gql`
   scalar Date
 
   type Query {
+    "A list of Categories"
     categories(filter: FilterCategoryInput): [Category!]!
     category(id: ID!): Category!
   }
 
   type Mutation {
-    addCategory(args: AddCategoryInput): CategoryMutationResponse!
+    "Create new category"
+    createCategory(argsObj: CreateCategoryInput!): CategoryMutationResponse!
     updateCategory(
       id: ID!
-      args: UpdateCategoryInput!
+      body: UpdateCategoryInput!
     ): CategoryMutationResponse!
   }
 
@@ -31,24 +33,28 @@ export const categorySchema = gql`
   }
 
   """
+  Category Add Input
+  """
+  input CreateCategoryInput {
+    name: String!
+    description: String!
+  }
+
+  """
   Category
   """
   type Category implements CommonType {
     id: ID!
+    "The name of the category"
     name: String!
-    code: String!
-    description: ID!
-    createdAt: Date!
-    updatedAt: Date
-  }
-
-  """
-  Category Add Input
-  """
-  input AddCategoryInput {
-    name: String!
-    code: String!
+    "The code to represent the category"
+    abbrevCode: String!
+    "The description of the category"
     description: String!
+    "Represent the date the category was created"
+    createdAt: Date!
+    "Represent the date the category was updated"
+    updatedAt: Date
   }
 
   """
@@ -56,7 +62,7 @@ export const categorySchema = gql`
   """
   input UpdateCategoryInput {
     name: String
-    code: String
+    # abbrevCode: String
     description: String
   }
 
@@ -67,15 +73,18 @@ export const categorySchema = gql`
   }
 
   interface MutationResponse {
-    code: String!
+    "Similar to HTTP status code, represents the status of the mutation"
+    code: Int!
+    "Indicates whether the mutation was successful"
     success: Boolean!
+    "Human-readable message for the UI"
     message: String!
   }
 
   type CategoryMutationResponse implements MutationResponse {
-    code: String!
+    code: Int!
     success: Boolean!
     message: String!
-    Category: Category!
+    category: Category
   }
 `;
