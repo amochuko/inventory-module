@@ -1,4 +1,5 @@
 import { Injectable } from "graphql-modules";
+import { getAbbrevationCodeFromName } from "../../../common/utils/helpers";
 import { Category, FilterCategoryInput } from "../../generated-types/graphql";
 import { CategoryCreationError } from "./category.error";
 import { ICategory } from "./category.interface";
@@ -9,7 +10,7 @@ export class CategoryService implements ICategory {
   constructor(private readonly categoryRepo: CategoryRepository) {}
 
   async findAll(args?: FilterCategoryInput): Promise<Category[]> {
-    return await this.categoryRepo.findAll();
+    return await this.categoryRepo.findAll(args);
   }
 
   findById(id: string): Promise<Category> {
@@ -23,11 +24,15 @@ export class CategoryService implements ICategory {
   }
 
   async create(
-    args: Pick<Category, "name" | "description" | "abbrevCode">
+    args: Pick<Category, "name" | "description">
   ): Promise<Category> {
     try {
       // TODD: Add validation logic here
-      return await this.categoryRepo.create(args);
+      const abbrevCode = getAbbrevationCodeFromName(args.name);
+      return await this.categoryRepo.create({
+        ...args,
+        abbrev_code: abbrevCode,
+      });
     } catch (err) {
       if (err instanceof CategoryCreationError) {
         // TODO: option call a centralized ErrorService here

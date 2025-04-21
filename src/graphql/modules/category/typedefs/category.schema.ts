@@ -48,13 +48,13 @@ export const categorySchema = gql`
     "The name of the category"
     name: String!
     "The code to represent the category"
-    abbrevCode: String!
+    abbrev_code: String!
     "The description of the category"
     description: String!
     "Represent the date the category was created"
-    createdAt: Date!
+    created_at: Date!
     "Represent the date the category was updated"
-    updatedAt: Date
+    updated_at: Date
   }
 
   """
@@ -68,8 +68,8 @@ export const categorySchema = gql`
 
   interface CommonType {
     id: ID!
-    createdAt: Date!
-    updatedAt: Date
+    created_at: Date!
+    updated_at: Date
   }
 
   interface MutationResponse {
