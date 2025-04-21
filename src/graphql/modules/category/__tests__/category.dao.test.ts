@@ -36,4 +36,14 @@ describe("CategoryDAO", () => {
       dao.create({ name: "Fail", abbrevCode: "FAIL", description: "none" })
     ).rejects.toThrow("Failed to create category");
   });
+
+  it('should detect duplicate constraint violation',async ()=>{
+    (sql as jest.Mock).mockRejectedValue(
+      new Error(
+        'duplicate key value violates unique constraint "categories_name_key"'
+      )
+    );
+
+    await expect(dao.create({name:'Duplicate', abbrevCode:'DUP',description:'Copy'})).rejects.toThrow('Category name already exists')
+  })
 });
