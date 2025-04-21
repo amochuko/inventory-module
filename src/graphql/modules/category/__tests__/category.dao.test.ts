@@ -1,5 +1,6 @@
 import { sql } from "../../../../config/database/sqlConnection";
 import CategoryDAO from "../category.dao";
+import { CategoryNotFoundError } from "../category.error";
 
 jest.mock("../../../../config/database/sqlConnection", () => ({
   sql: jest.fn(),
@@ -7,21 +8,25 @@ jest.mock("../../../../config/database/sqlConnection", () => ({
 
 const mockCategories = [
   {
+    id: "1",
     name: "Electronics",
     abbrev_code: "ELE-11",
     description: "Tech",
   },
   {
+    id: "2",
     name: "Food",
     abbrev_code: "FOD-4",
     description: "Feed house",
   },
   {
+    id: "3",
     name: "Food and Games",
     abbrev_code: "FOD-14",
     description: "Feed house",
   },
   {
+    id: "4",
     name: "Food and Hunt",
     abbrev_code: "FOD-13",
     description: "Feed house",
@@ -31,7 +36,7 @@ const mockCategories = [
 describe("CategoryDAO", () => {
   const dao = new CategoryDAO();
 
-  describe("create", async () => {
+  describe("create", () => {
     it("should create a category successfully", async () => {
       (sql as jest.Mock).mockReturnValue({
         rowCount: 1,
@@ -39,7 +44,7 @@ describe("CategoryDAO", () => {
       });
 
       const result = await dao.create({
-        abbrev_code: "ELE",
+        abbrev_code: "ELE-10",
         description: "TECH",
         name: "Electronic",
       });
@@ -91,6 +96,24 @@ describe("CategoryDAO", () => {
 
       const res = await dao.findAll({ filterByName: "food", skip: 0, take: 4 });
       expect(res).toEqual(mockCategories.slice(2));
+    });
+  });
+
+  describe("findById", () => {
+    it("should return a category by id", async () => {
+      (sql as jest.Mock).mockResolvedValue({
+        rowCount: 1,
+        rows: [mockCategories[0]],
+      });
+
+      const category = await dao.findById("1");
+      expect(category).toEqual(mockCategories[0]);
+    });
+
+    it("should throw if category by id is not in db", async () => {
+      (sql as jest.Mock).mockRejectedValue(new CategoryNotFoundError());
+
+      await expect(dao.findById("5")).rejects.toThrow(CategoryNotFoundError);
     });
   });
 });
