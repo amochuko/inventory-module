@@ -28,4 +28,12 @@ describe("CategoryDAO", () => {
 
     expect(result).toEqual(mockCategory);
   });
+
+  it("should throw a creation error if insert fails", async () => {
+    (sql as jest.Mock).mockReturnValue({ rowCount: 0, rows: [] });
+
+    await expect(
+      dao.create({ name: "Fail", abbrevCode: "FAIL", description: "none" })
+    ).rejects.toThrow("Failed to create category");
+  });
 });
