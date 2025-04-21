@@ -80,8 +80,8 @@ const yoga = createYoga({
     useGraphQLModules(application),
     useExtendContext((ctx) => {
       return {
-        ...ctx,
-        ...createContext(ctx),
+        ctx,
+        // ...createContext(ctx),
       };
     }),
     // useResponseCache({
