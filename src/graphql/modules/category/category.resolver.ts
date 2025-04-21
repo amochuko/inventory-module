@@ -10,7 +10,7 @@ export const categoryResolvers: CategoryModule.Resolvers = {
   Query: {
     categories: async (_, args, ctx) => {
       logger.info("resolving categories");
-     
+      return await ctx.injector.get(CategoryService).findAll();
     },
   },
   Mutation: {
