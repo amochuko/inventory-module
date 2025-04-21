@@ -5,7 +5,7 @@ export const requestTime = function (
   res: Response,
   next: NextFunction
 ) {
-  req.requestTime = Date.now();
+  // req.requestTime = Date.now();
 
   next();
 };

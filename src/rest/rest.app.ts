@@ -3,7 +3,6 @@ import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
-import { CustomError } from "../common/utils/types";
 import { requestTime } from "./middleware";
 import { birdRouter, homeRouter, usersRouter } from "./routers";
 
@@ -56,16 +55,16 @@ class App {
     // Yoga GraphQL
     this.app.use(requestTime);
 
-    function error(status: number, message: string): CustomError {
-      const err = new Error(message) as CustomError;
-      err.name = message;
-      err.status = status;
-      return err;
-    }
+    // function error(status: number, message: string): CustomError {
+    //   const err = new Error(message) as CustomError;
+    //   err.name = message;
+    //   err.status = status;
+    //   return err;
+    // }
 
     process.on("uncaughtException", (err) => {
       console.error(`${err.name} ${err.message}`);
-      error(0, err.message);
+      // error(0, err.message);
     });
   }
 
