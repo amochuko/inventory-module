@@ -12,12 +12,34 @@ export default class CategoryDAO implements ICategory {
   //
   async findAll(args?: FilterCategoryInput): Promise<Category[]> {
     try {
-      const res = await sql({
-        query: `SELECT * FROM inventory.categories
-        
-        ORDER BY id ASC`,
-        params: [],
-      });
+      const conditions: string[] = [];
+      const params: any[] = [];
+      let paramIndex = 1;
+
+      if (args?.filterByName) {
+        conditions.push(`name ILIKE ($${paramIndex++})`);
+        params.push(`${args.filterByName}%`);
+      }
+
+      let query = `SELECT * FROM inventory.categories`;
+
+      if (conditions.length > 0) {
+        query += ` WHERE ${conditions.join(" AND ")}`;
+      }
+
+      query += ` ORDER BY id ASC`;
+
+      if (args?.take) {
+        query += ` LIMIT ($${paramIndex++})`;
+        params.push(args.take);
+      }
+
+      if (args?.skip) {
+        query += ` OFFSET ($${paramIndex++})`;
+        params.push(args.skip);
+      }
+
+      const res = await sql({ query, params });
 
       return res.rows;
     } catch (err) {
