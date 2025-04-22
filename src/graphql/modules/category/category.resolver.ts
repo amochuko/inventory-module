@@ -1,10 +1,15 @@
 import { GraphQLError } from "graphql";
 import { createLogger } from "graphql-yoga";
+import { z } from "zod";
 import { DateScalar } from "../../types/custom-scalar";
 import { CategoryService } from "./category.service";
 import { CategoryModule } from "./generated-types/module-types";
 
 const logger = createLogger("debug");
+
+const DeletCategoryArgSchema = z.object({
+  id: z.coerce.string().regex(/^\d+$/, "Category ID must be numeric string"),
+});
 
 export const categoryResolvers: CategoryModule.Resolvers = {
   Query: {
@@ -94,10 +99,30 @@ export const categoryResolvers: CategoryModule.Resolvers = {
     deleteCategory: async (_, args, ctx) => {
       logger.info(`Attempting to delete category with id: ${args.id}`);
 
-      try {
-        await ctx.injector.get(CategoryService).deleteById(args.id);
+      const validation = DeletCategoryArgSchema.safeParse(args);
 
-        logger.info(`Successfully deleted category with id: ${args.id}`);
+      if (!validation.success) {
+        const validationErrors = validation.error.format();
+
+        logger.warn(
+          "Validation failed for deleteCategoryById args",
+          validationErrors
+        );
+
+        throw new GraphQLError("Invalid input for deleting category", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            validationErrors,
+            http: {
+              status: 400,
+            },
+          },
+        });
+      }
+
+      try {
+        await ctx.injector.get(CategoryService).deleteById(validation.data.id);
+
         return {
           success: true,
           code: 200,
