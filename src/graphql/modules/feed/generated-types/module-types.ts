@@ -5,11 +5,11 @@ export namespace FeedModule {
   interface DefinedFields {
     Query: 'feed' | 'link' | 'comment';
     Mutation: 'postLink' | 'updateLink' | 'postCommentOnLink';
-    Link: 'feed_id' | 'url' | 'description' | 'comments' | 'createdAt' | 'updatedAt';
-    Comment: 'id' | 'body' | 'link' | 'createdAt' | 'updatedAt';
+    Link: 'feed_id' | 'url' | 'description' | 'comments' | 'created_at' | 'updated_at';
+    Comment: 'id' | 'body' | 'link' | 'created_at' | 'updated_at';
     PostCommentOnLinkMutationResponse: 'code' | 'success' | 'message' | 'comment';
     UpdateLinkMutationResponse: 'code' | 'success' | 'message' | 'link';
-    CommonType: 'id' | 'createdAt' | 'updatedAt';
+    CommonType: 'created_at' | 'updated_at';
   };
   
   interface DefinedInputFields {
@@ -25,7 +25,7 @@ export namespace FeedModule {
   export type UpdateLinkMutationResponse = Pick<Types.UpdateLinkMutationResponse, DefinedFields['UpdateLinkMutationResponse']>;
   export type FeedUpdateInputArgs = Pick<Types.FeedUpdateInputArgs, DefinedInputFields['FeedUpdateInputArgs']>;
   export type PostCommentOnLinkMutationResponse = Pick<Types.PostCommentOnLinkMutationResponse, DefinedFields['PostCommentOnLinkMutationResponse']>;
-  export type CommonType = Pick<Types.CommonType, DefinedFields['CommonType']>;
+  export type CommonType = Types.CommonType;
   export type MutationResponse = Types.MutationResponse;
   
   export type Scalars = Pick<Types.Scalars, 'Date'>;
@@ -71,16 +71,16 @@ export namespace FeedModule {
       url?: gm.Middleware[];
       description?: gm.Middleware[];
       comments?: gm.Middleware[];
-      createdAt?: gm.Middleware[];
-      updatedAt?: gm.Middleware[];
+      created_at?: gm.Middleware[];
+      updated_at?: gm.Middleware[];
     };
     Comment?: {
       '*'?: gm.Middleware[];
       id?: gm.Middleware[];
       body?: gm.Middleware[];
       link?: gm.Middleware[];
-      createdAt?: gm.Middleware[];
-      updatedAt?: gm.Middleware[];
+      created_at?: gm.Middleware[];
+      updated_at?: gm.Middleware[];
     };
     PostCommentOnLinkMutationResponse?: {
       '*'?: gm.Middleware[];

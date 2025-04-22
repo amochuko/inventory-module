@@ -41,22 +41,21 @@ export const feedSchema = gql`
     url: String!
     description: String!
     comments: [Comment!]!
-    createdAt: Date!
-    updatedAt: Date
+    created_at: Date!
+    updated_at: Date
   }
 
   type Comment {
     id: ID!
     body: String!
     link: Link!
-    createdAt: Date!
-    updatedAt: Date
+    created_at: Date!
+    updated_at: Date
   }
 
-  interface CommonType {
-    id: ID!
-    createdAt: Date!
-    updatedAt: Date
+  extend interface CommonType {
+    created_at: Date!
+    updated_at: Date
   }
 
   type PostCommentOnLinkMutationResponse implements MutationResponse {
