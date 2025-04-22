@@ -16,6 +16,7 @@ export const categorySchema = gql`
       id: ID!
       body: UpdateCategoryInput!
     ): CategoryMutationResponse!
+    deleteCategoryById(id: ID!): CategoryMutationResponse
   }
 
   # Subscription
