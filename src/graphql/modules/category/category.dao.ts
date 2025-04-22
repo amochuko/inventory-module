@@ -71,8 +71,27 @@ export default class CategoryDAO implements ICategory {
     }
   }
 
-  updateById(id: string, body: Partial<Category>): Promise<Category> {
-    throw new Error("Method not implemented.");
+  async updateById(id: string, body: Partial<Category>): Promise<Category> {
+    try {
+      const keys = Object.keys(body) as (keyof typeof body)[];
+
+      const setClause = keys.map((k, i) => `${k} = ($${i + 1})`).join(", ");
+
+      const values = keys.map((k) => body[k]);
+
+      const result = await sql({
+        query: `UPDATE inventory.categories
+                    SET ${setClause}
+                WHERE id = ($${keys.length + 1})
+                RETURNING *`,
+        params: [...values, id],
+      });
+
+      return result.rows[0];
+    } catch (err) {
+      logger.error(err);
+      throw new CategoryNotFoundError();
+    }
   }
 
   deleteById(id: string): Promise<Boolean> {
