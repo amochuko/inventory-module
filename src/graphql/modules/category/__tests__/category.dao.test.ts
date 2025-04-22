@@ -116,4 +116,27 @@ describe("CategoryDAO", () => {
       await expect(dao.findById("5")).rejects.toThrow(CategoryNotFoundError);
     });
   });
+
+  describe.only("updateById", () => {
+    const name = "Electronics and Gadgets";
+
+    it("should update a category by id", async () => {
+      (sql as jest.Mock).mockResolvedValue({
+        rowCount: 1,
+        rows: [{ ...mockCategories[0], name }],
+      });
+
+      const category = await dao.updateById("1", { name });
+
+      expect(category.name).toEqual(name);
+    });
+
+    it("should throw if category by id is not in db", async () => {
+      (sql as jest.Mock).mockRejectedValue(new CategoryNotFoundError());
+
+      await expect(dao.updateById("5", { name })).rejects.toThrow(
+        CategoryNotFoundError
+      );
+    });
+  });
 });
