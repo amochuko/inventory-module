@@ -94,8 +94,23 @@ export default class CategoryDAO implements ICategory {
     }
   }
 
-  deleteById(id: string): Promise<Boolean> {
-    throw new Error("Method not implemented.");
+  async deleteById(id: string): Promise<boolean> {
+    try {
+      const res = await sql({
+        query: `DELETE FROM inventory.categories
+                              WHERE id = ($1)
+                            `,
+        params: [id],
+      });
+
+      if (res.rowCount) {
+        return true;
+      }
+
+      throw new CategoryNotFoundError(`No category with id '${id}`);
+    } catch (err) {
+      throw new CategoryNotFoundError();
+    }
   }
 
   async create(
