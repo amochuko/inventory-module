@@ -35,6 +35,10 @@ export class CategoryService implements ICategory {
     return await this.categoryRepo.updateById(id, body);
   }
 
+  async deleteById(id: string): Promise<boolean> {
+    //TODO: validate args input
+    return await this.categoryRepo.deleteById(id);
+  }
 
   async create(
     args: Pick<Category, "name" | "description">

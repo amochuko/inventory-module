@@ -19,6 +19,9 @@ export class CategoryRepository implements ICategory {
     return await this.categoryDao.updateById(id, body);
   }
 
+  async deleteById(id: string): Promise<boolean> {
+    return await this.categoryDao.deleteById(id);
+  }
 
   async create(
     args: Pick<Category, "name" | "abbrev_code" | "description">
