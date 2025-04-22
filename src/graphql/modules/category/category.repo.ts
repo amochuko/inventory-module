@@ -15,13 +15,10 @@ export class CategoryRepository implements ICategory {
     return await this.categoryDao.findById(id);
   }
 
-  updateById(id: string, body: Partial<Category>): Promise<Category> {
-    throw new Error("Method not implemented.");
+  async updateById(id: string, body: Partial<Category>): Promise<Category> {
+    return await this.categoryDao.updateById(id, body);
   }
 
-  deleteById(id: string): Promise<Boolean> | void {
-    throw new Error("Method not implemented.");
-  }
 
   async create(
     args: Pick<Category, "name" | "abbrev_code" | "description">

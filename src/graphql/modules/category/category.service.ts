@@ -4,6 +4,7 @@ import { Category, FilterCategoryInput } from "../../generated-types/graphql";
 import { CategoryCreationError } from "./category.error";
 import { ICategory } from "./category.interface";
 import { CategoryRepository } from "./category.repo";
+import { CategoryModule } from "./generated-types/module-types";
 
 @Injectable()
 export class CategoryService implements ICategory {
@@ -18,13 +19,22 @@ export class CategoryService implements ICategory {
     // TODO: validate args input
     return await this.categoryRepo.findById(id);
   }
-  
-  updateById(id: string, body: Partial<Category>): Promise<Category> {
-    throw new Error("Method not implemented.");
+
+  async updateById(
+    id: string,
+    body: Partial<CategoryModule.Category>
+  ): Promise<Category> {
+    //TODO: validate args input
+
+    if (body.name) {
+      // update abbre_code
+      body.abbrev_code = getAbbrevationCodeFromName(body.name);
+      return await this.categoryRepo.updateById(id, body);
+    }
+
+    return await this.categoryRepo.updateById(id, body);
   }
-  deleteById(id: string): Promise<Boolean> {
-    throw new Error("Method not implemented.");
-  }
+
 
   async create(
     args: Pick<Category, "name" | "description">
