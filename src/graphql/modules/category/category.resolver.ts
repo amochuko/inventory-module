@@ -91,7 +91,7 @@ export const categoryResolvers: CategoryModule.Resolvers = {
         };
       }
     },
-    deleteCategoryById: async (_, args, ctx) => {
+    deleteCategory: async (_, args, ctx) => {
       logger.info(`Attempting to delete category with id: ${args.id}`);
 
       try {
