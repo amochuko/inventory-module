@@ -6,7 +6,7 @@ export const categorySchema = gql`
   type Query {
     "A list of Categories"
     categories(filter: FilterCategoryInput): [Category!]!
-    category(id: ID!): Category!
+    category(id: ID!): Category
   }
 
   type Mutation {
