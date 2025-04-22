@@ -25,6 +25,11 @@ const UpdateCategoryArgSchema = z.object({
   }),
 });
 
+const CreateCategoryArgSchema = z.object({
+  name: z.string({ message: "Name is required." }).trim(),
+  description: z.string({ message: "Description is required." }).trim(),
+});
+
 export const categoryResolvers: CategoryModule.Resolvers = {
   Query: {
     categories: async (_, { filter }, ctx) => {
@@ -56,21 +61,34 @@ export const categoryResolvers: CategoryModule.Resolvers = {
   },
   Mutation: {
     createCategory: async (_, { argsObj }, ctx) => {
-      logger.info("resolving create category");
+      // logger.info(`Attempting to create category:`, argsObj);
+
+      const validation = CreateCategoryArgSchema.safeParse(argsObj);
+      console.log(validation.data);
+
+      if (!validation.success) {
+        const validationErrors = validation.error.format();
+
+        logger.warn(
+          "Validation failed for createCategory args",
+          validationErrors
+        );
+
+        throw new GraphQLError("Invalid input for create category", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            validationErrors,
+            http: {
+              status: 400,
+            },
+          },
+        });
+      }
 
       try {
-        const res = await ctx.injector.get(CategoryService).create(argsObj);
-
-        if (!res) {
-          throw new GraphQLError(res, {
-            extensions: {
-              code: "CATEGORY_NOT_CREATED",
-              http: {
-                status: 400,
-              },
-            },
-          });
-        }
+        const res = await ctx.injector
+          .get(CategoryService)
+          .create(validation.data);
 
         return {
           success: true,
@@ -80,12 +98,16 @@ export const categoryResolvers: CategoryModule.Resolvers = {
         };
       } catch (err) {
         logger.error("Unexpected error in resolver:", err);
-        return {
-          success: false,
-          code: 400,
-          message: `${err}`,
-          category: null,
-        };
+        throw new GraphQLError(
+          "An unexpected error occurred while creating the category.",
+          {
+            extensions: {
+              code: "CATEGORY_NOT_CREATED",
+              http: { status: 500 },
+              originalError: err,
+            },
+          }
+        );
       }
     },
     updateCategory: async (_, args, ctx) => {
