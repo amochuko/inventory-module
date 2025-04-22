@@ -14,14 +14,14 @@ const links: FeedModule.Link[] = [
     description:
       "GraphQL Code Generator is a plugin-based tool that helps you get the best out of your GraphQL stack. From back-end to front-end, GraphQL Code.",
     comments: [],
-    createdAt: new Date(),
+    created_at: new Date(),
   },
   {
     feed_id: "1012",
     description: "Generator automates the generation of the hello links",
     url: "https://example.com",
     comments: [],
-    createdAt: new Date(),
+    created_at: new Date(),
   },
 ];
 
@@ -32,13 +32,13 @@ const comments: FeedModule.Comment[] = [
     id: "1234",
     body: "String of the body hello",
     link: links[0],
-    createdAt: date,
+    created_at: date,
   },
   {
     id: "4567",
     body: "hello",
     link: links[1],
-    createdAt: date,
+    created_at: date,
   },
 ];
 
@@ -140,7 +140,7 @@ export const feedResolvers: FeedModule.Resolvers = {
       const comment: FeedModule.Comment = {
         body: String(args.body),
         link: link!,
-        createdAt: date,
+        created_at: date,
         id: "",
       };
 
@@ -159,7 +159,7 @@ export const feedResolvers: FeedModule.Resolvers = {
     feed_id: (parent) => parent.feed_id,
     description: (parent) => parent.description,
     url: (parent) => parent.url,
-    createdAt: (parent) => parent.createdAt,
+    created_at: (parent) => parent.created_at,
     comments: (parent, args, ctx) => {
       return comments;
     },
