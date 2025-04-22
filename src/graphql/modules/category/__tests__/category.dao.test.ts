@@ -117,7 +117,7 @@ describe("CategoryDAO", () => {
     });
   });
 
-  describe.only("updateById", () => {
+  describe("updateById", () => {
     const name = "Electronics and Gadgets";
 
     it("should update a category by id", async () => {
@@ -137,6 +137,25 @@ describe("CategoryDAO", () => {
       await expect(dao.updateById("5", { name })).rejects.toThrow(
         CategoryNotFoundError
       );
+    });
+  });
+
+  describe.only("deleteById", () => {
+    it("should delete a category by id", async () => {
+      (sql as jest.Mock).mockResolvedValue({
+        rowCount: 1,
+        rows: [],
+      });
+
+      const res = await dao.deleteById("1");
+
+      expect(res).toBeTruthy();
+    });
+
+    it("should throw if category by id is not in db", async () => {
+      (sql as jest.Mock).mockRejectedValue(new CategoryNotFoundError());
+
+      await expect(dao.deleteById("5")).rejects.toThrow(CategoryNotFoundError);
     });
   });
 });
