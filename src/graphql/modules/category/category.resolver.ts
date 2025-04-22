@@ -17,6 +17,23 @@ export const categoryResolvers: CategoryModule.Resolvers = {
         take: filter?.take,
       });
     },
+    category: async (_, args, ctx) => {
+      const res = await ctx.injector.get(CategoryService).findById(args.id);
+
+      if (!res) {
+        throw new GraphQLError(`Category with id ${args.id} not found.`, {
+          extensions: {
+            code: "CATEGORY_NOT_FOUND",
+            linkId: args.id,
+            http: {
+              status: 400,
+            },
+          },
+        });
+      }
+
+      return res;
+    },
   },
   Mutation: {
     createCategory: async (_, { argsObj }, ctx) => {
