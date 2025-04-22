@@ -7,8 +7,22 @@ import { CategoryModule } from "./generated-types/module-types";
 
 const logger = createLogger("debug");
 
-const DeletCategoryArgSchema = z.object({
-  id: z.coerce.string().regex(/^\d+$/, "Category ID must be numeric string"),
+const DeleteCategoryArgSchema = z.object({
+  id: z.coerce
+    .string()
+    .trim()
+    .regex(/^\d+$/, "Category ID must be numeric string"),
+});
+
+const UpdateCategoryArgSchema = z.object({
+  id: z.coerce
+    .string()
+    .trim()
+    .regex(/^\d+$/, "Category ID must be numeric string"),
+  body: z.object({
+    name: z.string().trim().optional(),
+    description: z.string().trim().optional(),
+  }),
 });
 
 export const categoryResolvers: CategoryModule.Resolvers = {
@@ -74,11 +88,38 @@ export const categoryResolvers: CategoryModule.Resolvers = {
         };
       }
     },
-    updateCategory: async (_, { id, body }, ctx) => {
+    updateCategory: async (_, args, ctx) => {
+      logger.info(`Attempting to update category of id '${args.id}`);
+
+      const validation = UpdateCategoryArgSchema.safeParse(args);
+      console.log(validation.data);
+
+      if (!validation.success) {
+        const validationErrors = validation.error.format();
+
+        logger.warn(
+          "Validation failed for updateCategory args",
+          validationErrors
+        );
+
+        throw new GraphQLError("Invalid input for updating category", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            validationErrors,
+            http: {
+              status: 400,
+            },
+          },
+        });
+      }
+
       try {
         const res = await ctx.injector
           .get(CategoryService)
-          .updateById(id, body as Partial<CategoryModule.Category>);
+          .updateById(
+            validation.data.id,
+            validation.data.body as Partial<CategoryModule.Category>
+          );
 
         return {
           success: true,
@@ -87,7 +128,8 @@ export const categoryResolvers: CategoryModule.Resolvers = {
           category: res,
         };
       } catch (err) {
-        logger.error(err);
+        logger.error("Error updateCategory", err);
+
         return {
           success: false,
           code: 400,
@@ -99,13 +141,13 @@ export const categoryResolvers: CategoryModule.Resolvers = {
     deleteCategory: async (_, args, ctx) => {
       logger.info(`Attempting to delete category with id: ${args.id}`);
 
-      const validation = DeletCategoryArgSchema.safeParse(args);
+      const validation = DeleteCategoryArgSchema.safeParse(args);
 
       if (!validation.success) {
         const validationErrors = validation.error.format();
 
         logger.warn(
-          "Validation failed for deleteCategoryById args",
+          "Validation failed for deleteCategory args",
           validationErrors
         );
 
