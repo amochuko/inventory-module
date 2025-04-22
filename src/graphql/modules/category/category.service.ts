@@ -10,12 +10,15 @@ export class CategoryService implements ICategory {
   constructor(private readonly categoryRepo: CategoryRepository) {}
 
   async findAll(args?: FilterCategoryInput): Promise<Category[]> {
+    // TODO: validate args input
     return await this.categoryRepo.findAll(args);
   }
 
-  findById(id: string): Promise<Category> {
-    throw new Error("Method not implemented.");
+  async findById(id: string): Promise<Category> {
+    // TODO: validate args input
+    return await this.categoryRepo.findById(id);
   }
+  
   updateById(id: string, body: Partial<Category>): Promise<Category> {
     throw new Error("Method not implemented.");
   }
