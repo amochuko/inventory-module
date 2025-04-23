@@ -22,7 +22,7 @@ dbClient.on("error", (err) => {
 
 type SQLArgs = {
   query: string;
-  params: (string | string[] | Buffer | ArrayBuffer)[];
+  params: (number |string | string[] | Buffer | ArrayBuffer)[];
 };
 export async function sql(args: SQLArgs) {
   const client = await dbClient.connect();
