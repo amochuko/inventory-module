@@ -6,11 +6,12 @@
 /report
 /demo
 /http
-
+/.vscode
 *.generated.*
 /src/script
 coverage/
 /dist
 
 
-/src/graphql/schema.ts
+src/common/services/__tests__/logger.service.test.ts
+src/common/services/logger.service.ts
