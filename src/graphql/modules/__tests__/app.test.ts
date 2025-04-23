@@ -1,12 +1,12 @@
 import { testkit } from "graphql-modules";
 import "reflect-metadata";
 import { application } from "../app";
-import { feedModule } from "../feed/feed.module";
+import { productModule } from "../product/product.module";
 
 describe("Testing the Application", () => {
   test("Replacing a module", () => {
     const app = testkit.mockApplication(application).replaceModule(
-      testkit.mockModule(feedModule, {
+      testkit.mockModule(productModule, {
         providers: [],
       })
     );
