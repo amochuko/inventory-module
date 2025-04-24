@@ -1,4 +1,4 @@
-import { sql } from "../../../../config/database/sqlConnection";
+import { sql } from "../../../../common/database/sqlConnection";
 import CategoryDAO from "../category.dao";
 import { CategoryNotFoundError } from "../category.error";
 

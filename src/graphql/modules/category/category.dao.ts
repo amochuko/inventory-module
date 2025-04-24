@@ -1,6 +1,7 @@
 import { Injectable } from "graphql-modules";
 import { createLogger } from "graphql-yoga";
-import { sql } from "../../../config/database/sqlConnection";
+
+import { sql } from "../../../common/database/sqlConnection";
 import { Category, FilterCategoryInput } from "../../generated-types/graphql";
 import {
   CategoryCreationError,
@@ -10,7 +11,6 @@ import {
 import { ICategory } from "./category.interface";
 
 const logger = createLogger("error");
-const categories = "inventory.categories";
 
 @Injectable()
 export default class CategoryDAO implements ICategory {

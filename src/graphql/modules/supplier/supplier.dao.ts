@@ -1,7 +1,8 @@
 import { Injectable } from "graphql-modules";
 import { createLogger } from "graphql-yoga";
-import { handlePostgresError } from "../../../config/database/dbErrorHandler";
-import { sql } from "../../../config/database/sqlConnection";
+
+import { handlePostgresError } from "../../../common/database/dbErrorHandler";
+import { sql } from "../../../common/database/sqlConnection";
 import { Supplier } from "../../generated-types/graphql";
 import { DAO, filterOptions } from "../interface/dao.interface";
 
