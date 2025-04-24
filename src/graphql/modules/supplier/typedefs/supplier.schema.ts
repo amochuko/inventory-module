@@ -1,40 +1,46 @@
 import { gql } from "graphql-modules";
 
 export const supplierSchema = gql`
+  scalar Date
+
   type Query {
-    "A list of Categories"
+    "A list of Supplier"
     suppliers: [Supplier!]!
+    "A Supplier"
     supplier(id: ID!): Supplier
   }
 
   type Mutation {
     "Create new supplier"
-    createSupplier(args: CreateSupplierInput!): SupplierMutationResponse!
+    createSupplier(s_input: CreateSupplierInput!): SupplierMutationResponse!
   }
 
   """
-  Supplier Add Input
+  Create Supplier Input
   """
   input CreateSupplierInput {
     name: String!
     description: String!
-    email: String
+    address: String!
+    email: String!
     phone: String!
   }
 
   """
-  Supplier
+  Supplier Entity
   """
   type Supplier {
     id: ID!
     "The name of the supplier"
     name: String!
-    "The code to represent the supplier"
-    email: String
+    "The email of the supplier"
+    email: String!
     "The description of the supplier"
     description: String!
-    "The description of the supplier"
+    "The phone number of the supplier"
     phone: String!
+    "The address of the supplier"
+    address: String!
     "Represent the date the supplier was created"
     created_at: Date!
     "Represent the date the supplier was updated"
@@ -54,6 +60,6 @@ export const supplierSchema = gql`
     code: Int!
     success: Boolean!
     message: String!
-    supplier: Supplier
+    supplier: Supplier!
   }
 `;
