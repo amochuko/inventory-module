@@ -60,6 +60,6 @@ export const supplierSchema = gql`
     code: Int!
     success: Boolean!
     message: String!
-    supplier: Supplier!
+    supplier: Supplier
   }
 `;
