@@ -1,5 +1,5 @@
 import pg from "pg";
-import env from "../env";
+import env from "../utils/env";
 
 export const dbClient =
   process.env.NODE_ENV != "production"
@@ -22,7 +22,7 @@ dbClient.on("error", (err) => {
 
 type SQLArgs = {
   query: string;
-  params: (number |string | string[] | Buffer | ArrayBuffer)[];
+  params: (number | string | string[] | Buffer | ArrayBuffer)[];
 };
 export async function sql(args: SQLArgs) {
   const client = await dbClient.connect();
