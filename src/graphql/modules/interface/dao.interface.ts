@@ -1,19 +1,13 @@
 type OrNull<T> = T | null;
 type OneOrMany<T> = T | T[];
 
-export interface filterOptions {
-  filterBy?: string;
-  take?: number;
-  skip: number;
-}
-
 /**
  * Interface for Data Access Object
  */
 export interface DAO<T> {
   create(args: T): Promise<T>;
 
-  findAll(args?: filterOptions): Promise<T[]>;
+  findAll(args?: any): Promise<T[]>;
 
   findById(id: string): Promise<T>;
 
