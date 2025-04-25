@@ -18,6 +18,63 @@ const suppliers: SupplierModule.Supplier[] = [
     created_at: 1745456019890,
     updated_at: 1745456019890,
   },
+  {
+    id: "2",
+    name: "Timeless Stand",
+    email: "timeless@yahoo.com",
+    phone: "09111223344",
+    description: "Best home made crafters",
+    address: "Alan road avenue",
+    created_at: 1745456019890,
+    updated_at: 1745456019890,
+  },
+  {
+    id: "3",
+    name: "Flight Land",
+    email: "flight_land@gmail.com",
+    phone: "07022324596",
+    description: "Best home made crafters",
+    address: "Alan road avenue",
+    created_at: 1745456019890,
+    updated_at: 1745456019890,
+  },
+  {
+    id: "4",
+    name: "Red Road",
+    email: "red_road@msn.com",
+    phone: "08012112233",
+    description: "Best home made crafters",
+    address: "Alan road avenue",
+    created_at: 1745456019890,
+    updated_at: 1745456019890,
+  },
+  {
+    id: "8",
+    name: "Timeless About",
+    email: "timeless%@gmail.com",
+    description: "Best home made crafters",
+    address: "Alan road avenue",
+    phone: "08199999999",
+    created_at: 1745587691620,
+  },
+  {
+    id: "9",
+    name: "Timeout Landers",
+    email: "timeout%@gmail.com",
+    description: "Best home made crafters",
+    address: "Alan road avenue",
+    phone: "07120202000",
+    created_at: 1745587774721,
+  },
+  {
+    id: "10",
+    name: "Time Overdraft",
+    email: "timeline%@gmail.com",
+    description: "Best home made crafters",
+    address: "Alan road avenue",
+    phone: "07120202000",
+    created_at: 1745587816203,
+  },
 ];
 
 describe("SupplierDAO", () => {
@@ -102,7 +159,7 @@ describe("SupplierDAO", () => {
     });
   });
 
-  describe.only("findAll", () => {
+  describe("findAll", () => {
     it("should list all suppliers", async () => {
       (sql as jest.Mock).mockReturnValue({
         rowCount: 1,
@@ -134,7 +191,28 @@ describe("SupplierDAO", () => {
       expect(res).toEqual([]);
     });
 
+    describe.only("findAll(filter)", () => {
+      it("should return data based on filter", async () => {
+        const filterredSuppliers = suppliers.filter((s) =>
+          s.email.includes("timeless")
+        );
 
+        (sql as jest.Mock).mockReturnValue({
+          rowCount: 1,
+          rows: filterredSuppliers,
+        });
 
+        const res = await dao.findAll({
+          filter: {
+            by: "EMAIL",
+            term: "timeless",
+            take: 2,
+          },
+        });
+
+        expect(res.length).toBe(filterredSuppliers.length);
+        expect(res).toEqual(filterredSuppliers);
+      });
+    });
   });
 });
