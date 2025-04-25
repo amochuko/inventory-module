@@ -5,7 +5,7 @@ export const supplierSchema = gql`
 
   type Query {
     "A list of Supplier"
-    suppliers: [Supplier!]!
+    suppliers(s_filter_input: SupplierFilterInput): [Supplier!]!
     "A Supplier"
     supplier(id: ID!): Supplier
   }
@@ -16,7 +16,7 @@ export const supplierSchema = gql`
   }
 
   """
-  Create Supplier Input
+  Supplier: Create Input
   """
   input CreateSupplierInput {
     name: String!
@@ -24,6 +24,28 @@ export const supplierSchema = gql`
     address: String!
     email: String!
     phone: String!
+  }
+
+  enum SupplierFilterEnum {
+    NAME
+    EMAIL
+    PHONE
+  }
+
+  input SupplierFilterOptionsInput {
+    by: SupplierFilterEnum
+    term: String
+    take: Int
+    skip: Int
+  }
+
+  # union NAME | EMAIL | PHONE_NUMBER
+  """
+  Supplier: Filter Input
+  """
+  input SupplierFilterInput {
+    # FilterBy can be 'name', 'email' or phone_number
+    filter: SupplierFilterOptionsInput
   }
 
   """
