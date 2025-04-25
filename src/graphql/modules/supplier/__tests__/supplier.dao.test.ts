@@ -191,7 +191,7 @@ describe("SupplierDAO", () => {
       expect(res).toEqual([]);
     });
 
-    describe.only("findAll(filter)", () => {
+    describe("findAll(filter)", () => {
       it("should return data based on filter", async () => {
         const filterredSuppliers = suppliers.filter((s) =>
           s.email.includes("timeless")
@@ -213,7 +213,7 @@ describe("SupplierDAO", () => {
         expect(res.length).toBe(filterredSuppliers.length);
         expect(res).toEqual(filterredSuppliers);
       });
-    
+
       it("should return empty array based on filter", async () => {
         const filterredSuppliers = suppliers.filter((s) =>
           s.email.includes("riad jack")
@@ -234,6 +234,19 @@ describe("SupplierDAO", () => {
         expect(res.length).toBe(0);
         expect(res).toEqual([]);
       });
+    });
+
+    it("should return supplier by id", async () => {
+      const filterredSuppliers = suppliers.filter((s) => s.id == "2");
+
+      (sql as jest.Mock).mockReturnValue({
+        rowCount: 1,
+        rows: filterredSuppliers,
+      });
+
+      const res = await dao.findById("3");
+
+      expect(res).toEqual(filterredSuppliers[0]);
     });
   });
 });
