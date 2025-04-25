@@ -101,4 +101,40 @@ describe("SupplierDAO", () => {
       );
     });
   });
+
+  describe.only("findAll", () => {
+    it("should list all suppliers", async () => {
+      (sql as jest.Mock).mockReturnValue({
+        rowCount: 1,
+        rows: suppliers,
+      });
+
+      const res = await dao.findAll();
+      expect(res.length).toBe(1);
+    });
+
+    it("should list all suppliers", async () => {
+      (sql as jest.Mock).mockReturnValue({
+        rowCount: 1,
+        rows: suppliers,
+      });
+
+      const res = await dao.findAll();
+      expect(res.length).toBe(1);
+    });
+
+    it("should return empty array", async () => {
+      (sql as jest.Mock).mockReturnValue({
+        rowCount: 0,
+        rows: [],
+      });
+
+      const res = await dao.findAll();
+      expect(res.length).toBe(0);
+      expect(res).toEqual([]);
+    });
+
+
+
+  });
 });
