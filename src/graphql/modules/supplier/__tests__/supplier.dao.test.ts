@@ -235,18 +235,28 @@ describe("SupplierDAO", () => {
         expect(res).toEqual([]);
       });
     });
+    describe.only("findById", () => {
+      it("should return supplier by id", async () => {
+        const filterredSuppliers = suppliers.filter((s) => s.id == "2");
 
-    it("should return supplier by id", async () => {
-      const filterredSuppliers = suppliers.filter((s) => s.id == "2");
+        (sql as jest.Mock).mockReturnValue({
+          rowCount: 1,
+          rows: filterredSuppliers,
+        });
 
-      (sql as jest.Mock).mockReturnValue({
-        rowCount: 1,
-        rows: filterredSuppliers,
+        const res = await dao.findById("3");
+
+        expect(res).toEqual(filterredSuppliers[0]);
       });
 
-      const res = await dao.findById("3");
+      it("should thrown when no such supplier by id", async () => {
+        const id = "3";
+        const err = `Supplier with id '${id}' not found.`;
 
-      expect(res).toEqual(filterredSuppliers[0]);
+        (sql as jest.Mock).mockReturnValueOnce(err);
+
+        await expect(dao.findById(id)).rejects.toThrow(err);
+      });
     });
   });
 });
