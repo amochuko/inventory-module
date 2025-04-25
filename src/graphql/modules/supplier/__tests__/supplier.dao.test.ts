@@ -213,6 +213,27 @@ describe("SupplierDAO", () => {
         expect(res.length).toBe(filterredSuppliers.length);
         expect(res).toEqual(filterredSuppliers);
       });
+    
+      it("should return empty array based on filter", async () => {
+        const filterredSuppliers = suppliers.filter((s) =>
+          s.email.includes("riad jack")
+        );
+
+        (sql as jest.Mock).mockReturnValue({
+          rowCount: 1,
+          rows: filterredSuppliers,
+        });
+
+        const res = await dao.findAll({
+          filter: {
+            by: "EMAIL",
+            term: "riad jack",
+          },
+        });
+
+        expect(res.length).toBe(0);
+        expect(res).toEqual([]);
+      });
     });
   });
 });
