@@ -6,18 +6,19 @@ export enum ErrorCodes {
   UNKNOWN = "UNKNOWN",
   VALIDATION_ERROR = "VALIDATION_ERROR",
   SERVER_ERROR = "SERVER_ERROR",
+  APP_ERROR = "APP_ERROR",
 }
 
 export default class AppError extends Error {
-  constructor(
-    public code: number | ErrorCodes,
-    public meta: Record<"ENTITY", Uppercase<string>> | Record<string, any>,
-    message: string | ErrorCodes
-  ) {
+  public statusCode: number;
+  public code: ErrorCodes;
+
+  constructor(message: string, code = ErrorCodes.APP_ERROR, statusCode = 500) {
     super(message);
     this.code = code;
-    this.meta = meta;
+    this.statusCode = statusCode;
     this.name = this.constructor.name;
+
     Error.captureStackTrace(this, this.constructor);
   }
 }
