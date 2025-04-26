@@ -148,9 +148,45 @@ export class SupplierDAO implements IDAO<SupplierModel> {
     id: string,
     changes: Partial<SupplierModel>
   ): Promise<SupplierModel> {
-  
+    logger.info("Supplier.updateById: ", changes);
 
-    throw new Error("Method not implemented.");
+    const sets: string[] = [];
+    const params: any[] = [];
+    let index = 1;
+
+    for (const [key, value] of Object.entries(changes)) {
+      sets.push(`${key} = $${index++}`);
+      params.push(value);
+    }
+
+    const query = `
+    UPDATE invetory.suppliers
+    SET ${sets.join(", ")}
+    WHERE id = $${index}
+    `;
+
+    try {
+      const supplier = await this.findById(id);
+      params.push(supplier.id);
+
+      const res = await sql({ query, params });
+
+      if (!res.rowCount) {
+        throw new Error(`Update failed for supplier id '${id}'`);
+      }
+
+      return res.rows[0];
+    } catch (err: any) {
+      if (err instanceof Error) {
+        throw err;
+      }
+
+      if (err.code) {
+        throw handlePostgresError(err, "SUPPLIER");
+      }
+
+      throw new Error(err);
+    }
   }
 
   deleteById(id: string): Promise<boolean | null> {
