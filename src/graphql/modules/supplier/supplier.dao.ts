@@ -189,7 +189,28 @@ export class SupplierDAO implements IDAO<SupplierModel> {
     }
   }
 
-  deleteById(id: string): Promise<boolean | null> {
-    throw new Error("Method not implemented.");
+  async deleteById(id: string): Promise<boolean | null> {
+    try {
+      const res = await sql({
+        query: `DELETE FROM inventory.suppliers s
+        WHERE s.id = ($1)
+        RETURNING 1`,
+        params: [id],
+      });
+
+      if (!res.rowCount) {
+        throw new Error(`Delete failed for supplier id '${id}'`);
+      }
+
+      return res.rowCount > 0;
+    } catch (err: any) {
+      logger.error(SupplierDAO.name, "DB error occurred", {
+        error: err,
+        stack: err.stack,
+        context: { entity: "SUPPLIER", operation: "findAll" },
+      });
+
+      throw catchErrorHandler(err, "SUPPLIER");
+    }
   }
 }
