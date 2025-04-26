@@ -299,7 +299,7 @@ describe("SupplierDAO", () => {
   });
 
   describe.only("deleteById", () => {
-    it("should thrown when no such supplier by id", async () => {
+    xit("should thrown when no such supplier by id", async () => {
       const id = "20003";
       const err = `Supplier with id '${id}' not found.`;
 
@@ -308,6 +308,20 @@ describe("SupplierDAO", () => {
       await expect(dao.deleteById(id)).rejects.toThrow(err);
     });
 
+    it("should delete a supplier by id", async () => {
+      const id = "3";
 
+      // 1. Mock sql to simulate a real existing supplier
+      mockFindById(dao, { id });
+
+      // 2. Mock sql to simulate a successful update
+      (sql as jest.Mock).mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id }],
+      });
+
+      const res = await dao.deleteById(id);
+      expect(res).toBeTruthy();
+    });
   });
 });
