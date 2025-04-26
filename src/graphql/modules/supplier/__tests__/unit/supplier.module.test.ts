@@ -1,5 +1,5 @@
 import { Application, testkit } from "graphql-modules";
-import { supplierModule } from "../suppiler.module";
+import { supplierModule } from "../../suppiler.module";
 
 describe("Testing supplierModule", () => {
   let app: Application;

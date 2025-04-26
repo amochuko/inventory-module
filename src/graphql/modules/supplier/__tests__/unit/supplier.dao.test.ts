@@ -1,9 +1,10 @@
-import { mockPgError } from "../../../../common/database/mockPgError";
-import { sql } from "../../../../common/database/sqlConnection";
-import { SupplierModule } from "../generated-types/module-types";
-import { SupplierDAO } from "../supplier.dao";
+import { mockPgError } from "../../../../../common/database/mockPgError";
+import { sql } from "../../../../../common/database/sqlConnection";
+import { SupplierModule } from "../../generated-types/module-types";
+import { SupplierModel } from "../../model/supplier.model";
+import { SupplierDAO } from "../../supplier.dao";
 
-jest.mock("../../../../common/database/sqlConnection", () => ({
+jest.mock("../../../../../common/database/sqlConnection", () => ({
   sql: jest.fn(),
 }));
 
@@ -235,28 +236,65 @@ describe("SupplierDAO", () => {
         expect(res).toEqual([]);
       });
     });
-    describe.only("findById", () => {
-      it("should return supplier by id", async () => {
-        const filterredSuppliers = suppliers.filter((s) => s.id == "2");
+  });
 
-        (sql as jest.Mock).mockReturnValue({
-          rowCount: 1,
-          rows: filterredSuppliers,
-        });
+  describe("findById", () => {
+    it("should return supplier by id", async () => {
+      const filterredSuppliers = suppliers.filter((s) => s.id == "2");
 
-        const res = await dao.findById("3");
-
-        expect(res).toEqual(filterredSuppliers[0]);
+      (sql as jest.Mock).mockReturnValue({
+        rowCount: 1,
+        rows: filterredSuppliers,
       });
 
-      it("should thrown when no such supplier by id", async () => {
-        const id = "3";
-        const err = `Supplier with id '${id}' not found.`;
+      const res = await dao.findById("3");
 
-        (sql as jest.Mock).mockReturnValueOnce(err);
+      expect(res).toEqual(filterredSuppliers[0]);
+    });
 
-        await expect(dao.findById(id)).rejects.toThrow(err);
+    it("should thrown when no such supplier by id", async () => {
+      const id = "3";
+      const err = `Supplier with id '${id}' not found.`;
+
+      (sql as jest.Mock).mockReturnValueOnce(err);
+
+      await expect(dao.findById(id)).rejects.toThrow(err);
+    });
+  });
+
+  describe.only("updateById", () => {
+    xit("should thrown when no such supplier by id", async () => {
+      const id = "20003";
+      const err = `Supplier with id '${id}' not found.`;
+
+      (sql as jest.Mock).mockRejectedValue(new Error(err));
+
+      await expect(
+        dao.updateById(id, { email: "new@email.com" })
+      ).rejects.toThrow(err);
+    });
+
+    it("should update a supplier by id", async () => {
+      const id = "3";
+      const email = "new@email.com";
+
+      jest
+        .spyOn(dao, "findById")
+        .mockReturnValueOnce(
+          new Promise((res, rej) =>
+            res(SupplierModel.rebuildFromPersistence({ ...suppliers[2] }))
+          )
+        );
+
+      (sql as jest.Mock).mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id, email }],
       });
+
+      const res = await dao.updateById(id, { email });
+      
+      expect(res.email).toBe(email);
+      expect(dao.findById).toHaveBeenCalledWith(id);
     });
   });
 });
