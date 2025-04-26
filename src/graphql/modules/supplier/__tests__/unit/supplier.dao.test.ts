@@ -1,7 +1,7 @@
 import { mockPgError } from "../../../../../common/database/mockPgError";
 import { sql } from "../../../../../common/database/sqlConnection";
+import { mockFindById } from "../../../__tests__/dao.mock";
 import { SupplierModule } from "../../generated-types/module-types";
-import { SupplierModel } from "../../model/supplier.model";
 import { SupplierDAO } from "../../supplier.dao";
 
 jest.mock("../../../../../common/database/sqlConnection", () => ({
@@ -80,6 +80,10 @@ const suppliers: SupplierModule.Supplier[] = [
 
 describe("SupplierDAO", () => {
   const dao = new SupplierDAO();
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
 
   describe("create", () => {
     it("should create a supplier", async () => {
@@ -262,8 +266,8 @@ describe("SupplierDAO", () => {
     });
   });
 
-  describe.only("updateById", () => {
-    xit("should thrown when no such supplier by id", async () => {
+  describe("updateById", () => {
+    it("should thrown when no such supplier by id", async () => {
       const id = "20003";
       const err = `Supplier with id '${id}' not found.`;
 
@@ -278,23 +282,32 @@ describe("SupplierDAO", () => {
       const id = "3";
       const email = "new@email.com";
 
-      jest
-        .spyOn(dao, "findById")
-        .mockReturnValueOnce(
-          new Promise((res, rej) =>
-            res(SupplierModel.rebuildFromPersistence({ ...suppliers[2] }))
-          )
-        );
+      // 1. Mock sql to simulate a real existing supplier
+      mockFindById(dao, { id });
 
+      // 2. Mock sql to simulate a successful update
       (sql as jest.Mock).mockResolvedValueOnce({
         rowCount: 1,
         rows: [{ id, email }],
       });
 
       const res = await dao.updateById(id, { email });
-      
+
       expect(res.email).toBe(email);
       expect(dao.findById).toHaveBeenCalledWith(id);
     });
+  });
+
+  describe.only("deleteById", () => {
+    it("should thrown when no such supplier by id", async () => {
+      const id = "20003";
+      const err = `Supplier with id '${id}' not found.`;
+
+      (sql as jest.Mock).mockRejectedValue(new Error(err));
+
+      await expect(dao.deleteById(id)).rejects.toThrow(err);
+    });
+
+
   });
 });
