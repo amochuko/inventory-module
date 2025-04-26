@@ -3,9 +3,12 @@ import { createLogger } from "graphql-yoga";
 
 import { handlePostgresError } from "../../../common/database/dbErrorHandler";
 import { sql } from "../../../common/database/sqlConnection";
+import { catchErrorHandler } from "../../../error/catchErrorHandler";
+import { NotFoundError } from "../../../error/not-found.error";
 import { Supplier } from "../../generated-types/graphql";
-import { DAO } from "../interface/dao.interface";
+import { IDAO } from "../interface/dao.interface";
 import { SupplierModule } from "./generated-types/module-types";
+import { SupplierModel } from "./model/supplier.model";
 
 const logger = createLogger("debug");
 
@@ -15,8 +18,8 @@ export type CreateSupplierArgs = Omit<
 >;
 
 @Injectable()
-export class SupplierDAO implements DAO<Supplier> {
-  async create(args: CreateSupplierArgs): Promise<Supplier> {
+export class SupplierDAO implements IDAO<SupplierModel> {
+  async create(args: CreateSupplierArgs): Promise<SupplierModel> {
     logger.info(SupplierDAO.name, ": creating a supplier");
 
     try {
@@ -33,7 +36,17 @@ export class SupplierDAO implements DAO<Supplier> {
         ],
       });
 
-      return res.rows[0];
+      const row = res.rows[0];
+      return new SupplierModel(
+        row.id,
+        row.name,
+        row.email,
+        row.address,
+        row.description,
+        row.phone,
+        new Date(row.created_at),
+        new Date(row.updated_at)
+      );
     } catch (err: any) {
       logger.error(SupplierDAO.name, "DB error occurred", {
         error: err,
@@ -41,13 +54,13 @@ export class SupplierDAO implements DAO<Supplier> {
         context: { entity: "SUPPLIER", operation: "create" },
       });
 
-      throw handlePostgresError(err, "SUPPLIER");
+      throw catchErrorHandler(err, "SUPPLIER");
     }
   }
 
   async findAll(
     args?: SupplierModule.SupplierFilterInput
-  ): Promise<Supplier[]> {
+  ): Promise<SupplierModel[]> {
     try {
       const conditions: any[] = [];
       let params: any[] = [];
@@ -86,12 +99,13 @@ export class SupplierDAO implements DAO<Supplier> {
       }
 
       logger.info("findAll: ", { query, params });
-      
+
       const res = await sql({ query, params });
 
       if (res.rowCount && res.rowCount > 0) {
-        return res.rows;
+        return res.rows.map(SupplierModel.rebuildFromPersistence);
       }
+
       return [];
     } catch (err: any) {
       logger.error(SupplierDAO.name, "DB error occurred", {
@@ -100,17 +114,46 @@ export class SupplierDAO implements DAO<Supplier> {
         context: { entity: "SUPPLIER", operation: "findAll" },
       });
 
-      throw handlePostgresError(err, "SUPPLIER");
+      throw catchErrorHandler(err, "SUPPLIER");
     }
   }
 
-  findById(id: string): Promise<Supplier> {
+  async findById(id: string): Promise<SupplierModel> {
+    try {
+      const res = await sql({
+        query: `SELECT * FROM inventory.suppliers 
+            WHERE id = ($1)`,
+        params: [id],
+      });
+
+      if (res.rowCount === 0) {
+        throw new NotFoundError({ resource: "Supplier", id });
+      }
+
+      return res.rows[0];
+    } catch (err: any) {
+      if (err instanceof Error) {
+        throw err;
+      }
+
+      if (err.code) {
+        throw handlePostgresError(err, "SUPPLIER");
+      }
+
+      throw new Error(err);
+    }
+  }
+
+  async updateById(
+    id: string,
+    changes: Partial<SupplierModel>
+  ): Promise<SupplierModel> {
+  
+
     throw new Error("Method not implemented.");
   }
-  updateById(id: string, body: Partial<Supplier>): Promise<Supplier> {
-    throw new Error("Method not implemented.");
-  }
-  deleteById(id: string): Promise<Supplier | null> {
+
+  deleteById(id: string): Promise<boolean | null> {
     throw new Error("Method not implemented.");
   }
 }
