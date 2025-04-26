@@ -298,8 +298,8 @@ describe("SupplierDAO", () => {
     });
   });
 
-  describe.only("deleteById", () => {
-    xit("should thrown when no such supplier by id", async () => {
+  describe("deleteById", () => {
+    it("should thrown when no such supplier by id", async () => {
       const id = "20003";
       const err = `Supplier with id '${id}' not found.`;
 
