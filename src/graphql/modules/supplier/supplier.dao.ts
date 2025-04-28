@@ -24,7 +24,7 @@ export class SupplierDAO implements IDAO<SupplierModel> {
 
     try {
       const res = await sql({
-        query: `INSERT INTO inventory.suppliers (name, description, email, address, phone)
+        text: `INSERT INTO inventory.suppliers (name, description, email, address, phone)
                 VALUES ($1, $2, $3 , $4, $5)
                 RETURNING *`,
         params: [
@@ -66,7 +66,7 @@ export class SupplierDAO implements IDAO<SupplierModel> {
       let params: any[] = [];
       let paramIndex = 1;
 
-      let query = "SELECT * FROM inventory.suppliers ";
+      let text = "SELECT * FROM inventory.suppliers ";
 
       if (args?.filter?.by && args?.filter?.by === "EMAIL") {
         conditions.push(`email ILIKE ($${paramIndex++})`);
@@ -84,23 +84,23 @@ export class SupplierDAO implements IDAO<SupplierModel> {
       }
 
       if (conditions.length > 0) {
-        query += `WHERE ${conditions.join(" OR ")} `;
+        text += `WHERE ${conditions.join(" OR ")} `;
       }
 
-      query += `ORDER BY id ASC `;
+      text += `ORDER BY id ASC `;
 
       if (args?.filter?.skip) {
-        query += `OFFSET ($${paramIndex++}) `;
+        text += `OFFSET ($${paramIndex++}) `;
         params.push(args.filter.skip);
       }
       if (args?.filter?.take) {
-        query += `LIMIT ($${paramIndex++}) `;
+        text += `LIMIT ($${paramIndex++}) `;
         params.push(args.filter.take);
       }
 
-      logger.info("findAll: ", { query, params });
+      logger.info("findAll: ", { text, params });
 
-      const res = await sql({ query, params });
+      const res = await sql({ text, params });
 
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(SupplierModel.rebuildFromPersistence);
@@ -121,7 +121,7 @@ export class SupplierDAO implements IDAO<SupplierModel> {
   async findById(id: string): Promise<SupplierModel> {
     try {
       const res = await sql({
-        query: `SELECT * FROM inventory.suppliers 
+        text: `SELECT * FROM inventory.suppliers 
             WHERE id = ($1)`,
         params: [id],
       });
@@ -159,7 +159,7 @@ export class SupplierDAO implements IDAO<SupplierModel> {
       params.push(value);
     }
 
-    const query = `
+    const text = `
     UPDATE invetory.suppliers
     SET ${sets.join(", ")}
     WHERE id = $${index}
@@ -169,7 +169,7 @@ export class SupplierDAO implements IDAO<SupplierModel> {
       const supplier = await this.findById(id);
       params.push(supplier.id);
 
-      const res = await sql({ query, params });
+      const res = await sql({ text, params });
 
       if (!res.rowCount) {
         throw new Error(`Update failed for supplier id '${id}'`);
@@ -192,7 +192,7 @@ export class SupplierDAO implements IDAO<SupplierModel> {
   async deleteById(id: string): Promise<boolean | null> {
     try {
       const res = await sql({
-        query: `DELETE FROM inventory.suppliers s
+        text: `DELETE FROM inventory.suppliers s
         WHERE s.id = ($1)
         RETURNING 1`,
         params: [id],

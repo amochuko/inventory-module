@@ -26,25 +26,25 @@ export default class CategoryDAO implements ICategory {
         params.push(`${args.filterByName}%`);
       }
 
-      let query = `SELECT * FROM inventory.categories`;
+      let text = `SELECT * FROM inventory.categories`;
 
       if (conditions.length > 0) {
-        query += ` WHERE ${conditions.join(" AND ")}`;
+        text += ` WHERE ${conditions.join(" AND ")}`;
       }
 
-      query += ` ORDER BY id ASC`;
+      text += ` ORDER BY id ASC`;
 
       if (args?.take) {
-        query += ` LIMIT ($${paramIndex++})`;
+        text += ` LIMIT ($${paramIndex++})`;
         params.push(args.take);
       }
 
       if (args?.skip) {
-        query += ` OFFSET ($${paramIndex++})`;
+        text += ` OFFSET ($${paramIndex++})`;
         params.push(args.skip);
       }
 
-      const res = await sql({ query, params });
+      const res = await sql({ text, params });
 
       return res.rows;
     } catch (err) {
@@ -59,7 +59,7 @@ export default class CategoryDAO implements ICategory {
   async findById(id: string): Promise<Category> {
     try {
       const result = await sql({
-        query: `SELECT * FROM inventory.categories
+        text: `SELECT * FROM inventory.categories
         WHERE id = ($1)`,
         params: [id],
       });
@@ -80,7 +80,7 @@ export default class CategoryDAO implements ICategory {
       const values = keys.map((k) => body[k]);
 
       const result = await sql({
-        query: `UPDATE inventory.categories
+        text: `UPDATE inventory.categories
                     SET ${setClause}
                 WHERE id = ($${keys.length + 1})
                 RETURNING *`,
@@ -97,7 +97,7 @@ export default class CategoryDAO implements ICategory {
   async deleteById(id: string): Promise<boolean> {
     try {
       const res = await sql({
-        query: `DELETE FROM inventory.categories
+        text: `DELETE FROM inventory.categories
                               WHERE id = ($1)
                             `,
         params: [id],
@@ -118,7 +118,7 @@ export default class CategoryDAO implements ICategory {
   ): Promise<Category> {
     try {
       const result = await sql({
-        query: `INSERT INTO inventory.categories (name, abbrev_code, description) VALUES ($1, $2, $3) RETURNING *;`,
+        text: `INSERT INTO inventory.categories (name, abbrev_code, description) VALUES ($1, $2, $3) RETURNING *;`,
         params: [args.name, args.abbrev_code, args.description],
       });
 
