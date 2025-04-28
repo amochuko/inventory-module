@@ -1,19 +1,26 @@
 import pg from "pg";
 import env from "../utils/env";
 
-export const dbClient =
-  process.env.NODE_ENV != "production"
-    ? new pg.Pool({
-        host: env.PGHOST_LOCAL,
-        user: env.PGUSER_LOCAL,
-        database: env.PGDATABASE_LOCAL,
-        password: env.PGPASSWORD_LOCAL,
-        port: env.PGPORT_LOCAL,
-        ssl: false,
-      })
-    : new pg.Pool({
-        connectionString: env.PGDB_CONNECTION_STRING,
-      });
+export const dbClient = (() => {
+  if (process.env.NODE_ENV === "development") {
+    return new pg.Pool({
+      host: env.PGHOST_LOCAL,
+      user: env.PGUSER_LOCAL,
+      database: env.PGDATABASE_LOCAL,
+      password: env.PGPASSWORD_LOCAL,
+      port: env.PGPORT_LOCAL,
+      ssl: false,
+    });
+  } else if (process.env.NODE_ENV === "test") {
+    return new pg.Pool({
+      connectionString: env.POSTGRES_TEST_DATABASE_URL,
+    });
+  } else {
+    return new pg.Pool({
+      connectionString: env.PGDB_CONNECTION_STRING,
+    });
+  }
+})();
 
 dbClient.on("error", (err) => {
   console.log("Unexpected error on idle client: ", err);
@@ -21,14 +28,14 @@ dbClient.on("error", (err) => {
 });
 
 type SQLArgs = {
-  query: string;
-  params: (number | string | string[] | Buffer | ArrayBuffer)[];
+  text: string;
+  params?: any[];
 };
-export async function sql(args: SQLArgs) {
+export async function sql<T extends pg.QueryResultRow = any>(args: SQLArgs) {
   const client = await dbClient.connect();
 
   try {
-    const result = await client.query(args.query, args.params);
+    const result = await client.query<T>(args.text, args.params);
     return result;
   } catch (err) {
     throw err;
