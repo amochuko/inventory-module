@@ -52,6 +52,8 @@ CREATE TABLE inventory.products (
         stock_keeping_unit VARCHAR(50) UNIQUE,
         created_at TIMESTAMPTZ DEFAULT NOW(),
         updated_at TIMESTAMPTZ,
+        manufactured_date TIMESTAMPTZ,
+        best_before_date TIMESTAMPTZ,
         CONSTRAINT pk_products_id PRIMARY KEY (id)
 );
 -- Stock levels
