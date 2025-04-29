@@ -43,3 +43,14 @@ export async function sql<T extends pg.QueryResultRow = any>(args: SQLArgs) {
     client.release();
   }
 }
+
+// for fetching just one row
+export async function queryOne<T extends pg.QueryResultRow = any>(
+  query: string,
+  params: any[] = []
+): Promise<T | null> {
+  const result = await sql<T>({ text: query, params });
+  return result.rows[0] || null;
+}
+
+
