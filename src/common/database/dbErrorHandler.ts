@@ -1,6 +1,7 @@
 import AppError, { ErrorCodes } from "../../error/app.error";
 import { DuplicateError } from "../../error/duplicate.error";
 import { NotFoundError } from "../../error/not-found.error";
+import { NotNullConstraintError } from "../../error/not-null-constraint.error";
 
 export function handlePostgresError(err: any, entity = "ENTITY") {
   const pgCode = err?.code;
@@ -15,11 +16,7 @@ export function handlePostgresError(err: any, entity = "ENTITY") {
   }
 
   if (pgCode === "23502") {
-    throw new DuplicateError(
-      "A required field is missing or null.",
-      ErrorCodes.VALIDATION_ERROR,
-      201
-    );
+    throw new NotNullConstraintError(err.message, ErrorCodes.NONE_NULL, 201);
   }
 
   // Default fallback
