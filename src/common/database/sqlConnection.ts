@@ -45,8 +45,11 @@ export async function sql<T extends pg.QueryResultRow = any>(args: SQLArgs) {
 }
 
 export async function shutdownDatabase() {
+  console.log("🧹 Calling dbClient.end()...");
   await dbClient.end();
+  console.log("✅ Pool ended.");
 }
+
 
 // for fetching just one row
 export async function queryOne<T extends pg.QueryResultRow = any>(
