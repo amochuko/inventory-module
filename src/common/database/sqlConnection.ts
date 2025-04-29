@@ -44,6 +44,10 @@ export async function sql<T extends pg.QueryResultRow = any>(args: SQLArgs) {
   }
 }
 
+export async function shutdownDatabase() {
+  await dbClient.end();
+}
+
 // for fetching just one row
 export async function queryOne<T extends pg.QueryResultRow = any>(
   query: string,
