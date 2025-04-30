@@ -1,9 +1,10 @@
-import { sql } from "../sqlConnection";
+import pg from "pg";
+import env from "../../utils/env";
+import { dbClient } from "../sqlConnection";
 
+jest.mock("pg"); // Mock the 'postgres' module
 
-jest.mock("postgres"); // Mock the 'postgres' module
-
-describe("Postgres connection config", () => {
+describe.only("Postgres connection config", () => {
   let originalEnv: NodeJS.ProcessEnv;
 
   beforeEach(() => {
@@ -15,7 +16,7 @@ describe("Postgres connection config", () => {
     process.env = originalEnv;
   });
 
-  it("should use the correct dev environment settings for dev", () => {
+  it("should use the correct dev environment settings for dev", async () => {
     // Set the environment to 'development'
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,17 +34,20 @@ describe("Postgres connection config", () => {
       require("../sqlConnection");
     });
 
-    expect(sql).toHaveBeenCalledWith({
-      host: "localhost",
-      user: "dev_user",
-      database: "dev_db",
-      password: "dev_password",
-      port: 5432,
-      ssl: false,
-    });
+    await dbClient.connect();
+    expect(pg.Pool).toHaveBeenCalledWith(
+      expect.objectContaining({
+        host: "localhost",
+        user: "dev_user",
+        database: "dev_db",
+        password: "dev_password",
+        port: 5432,
+        ssl: false,
+      })
+    );
   });
 
-  it("should use the correct production environment settings for production", () => {
+  it("should use the correct production environment settings for production", async () => {
     // Set the environment to 'production'
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -61,13 +65,11 @@ describe("Postgres connection config", () => {
       require("../sqlConnection");
     });
 
-    expect(sql).toHaveBeenCalledWith({
-      host: "prod_host",
-      database: "prod_db",
-      user: "prod_user",
-      password: "prod_password",
-      port: 5432,
-      ssl: true,
-    });
+    await dbClient.connect();
+    expect(pg.Pool).toHaveBeenCalledWith(
+      expect.objectContaining({
+        connectionString: env.PGDB_CONNECTION_STRING,
+      })
+    );
   });
 });
