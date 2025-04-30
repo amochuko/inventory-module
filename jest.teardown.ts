@@ -1,6 +1,12 @@
-import { shutdownDatabase } from "./src/common/database/sqlConnection";
+// jest.teardown.ts
+import { dbClient } from "./src/common/database/sqlConnection";
 
 export default async () => {
-    console.info('[Global teardown]: shutting down DB pool...\n')
-    await shutdownDatabase();
-}
+  console.log("idleCount:", dbClient.getPool().idleCount);
+  console.log("totalCount:", dbClient.getPool().totalCount);
+  console.log("waitingCount:", dbClient.getPool().waitingCount);
+
+  console.log("🧹 Global teardown: closing dbClient pool...");
+  await dbClient.getPool().end();
+  console.log("✅ dbClient pool closed");
+};

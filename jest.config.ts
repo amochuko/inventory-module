@@ -64,7 +64,7 @@ const config: Config = {
   globalSetup: "<rootDir>/jest.global-setup.ts",
 
   // A path to a module which exports an async function that is triggered once after all test suites
-  globalTeardown: '<rootDir>/jest.teardown.ts',
+  globalTeardown: "<rootDir>/jest.teardown.ts",
 
   // A set of global variables that need to be available in all test environments
   // globals: {},

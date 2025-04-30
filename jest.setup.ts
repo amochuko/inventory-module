@@ -8,8 +8,6 @@ dotenv.config({ path: ".env.test" });
 import "reflect-metadata";
 import { sql } from "./src/common/database/sqlConnection";
 
-console.log("✅ Jest setup file executed");
-
 beforeEach(async () => {
   console.log("⚠️ Truncating suppliers table...");
 
