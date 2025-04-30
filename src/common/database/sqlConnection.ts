@@ -10,7 +10,7 @@ export const dbClient = {
       pool = new pg.Pool({
         connectionString:
           nodeEnv === "test"
-            ? env.POSTGRES_TEST_DATABASE_URL
+            ? env.PGDB_TEST_CONNECTION_STRING
             : nodeEnv === "development"
             ? env.PGDB_DEV_CONNECTION_STRING
             : env.PGDB_PRO_CONNECTION_STRING,
