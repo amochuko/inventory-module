@@ -1,3 +1,5 @@
+import { sql } from "../../../../../common/database/sqlConnection";
+import { simulateServerError } from "../../../../util/test-utils/simulateServerError";
 import { SupplierModule } from "../../generated-types/module-types";
 import { SupplierDAO } from "../../supplier.dao";
 
@@ -22,133 +24,161 @@ const suppliers: SupplierModule.Supplier[] = [
     created_at: 1745456019890,
     updated_at: 1745456019890,
   },
-  {
-    id: "3",
-    name: "Flight Land",
-    email: "flight_land@gmail.com",
-    phone: "07022324596",
-    description: "Best home made crafters",
-    address: "Alan road avenue",
-    created_at: 1745456019890,
-    updated_at: 1745456019890,
-  },
-  {
-    id: "4",
-    name: "Red Road",
-    email: "red_road@msn.com",
-    phone: "08012112233",
-    description: "Best home made crafters",
-    address: "Alan road avenue",
-    created_at: 1745456019890,
-    updated_at: 1745456019890,
-  },
-  {
-    id: "8",
-    name: "Timeless About",
-    email: "timeless%@gmail.com",
-    description: "Best home made crafters",
-    address: "Alan road avenue",
-    phone: "08199999999",
-    created_at: 1745587691620,
-  },
-  {
-    id: "9",
-    name: "Timeout Landers",
-    email: "timeout%@gmail.com",
-    description: "Best home made crafters",
-    address: "Alan road avenue",
-    phone: "07120202000",
-    created_at: 1745587774721,
-  },
-  {
-    id: "10",
-    name: "Time Overdraft",
-    email: "timeline%@gmail.com",
-    description: "Best home made crafters",
-    address: "Alan road avenue",
-    phone: "07120202000",
-    created_at: 1745587816203,
-  },
 ];
 
 describe("SupplierDAO", () => {
   const dao = new SupplierDAO();
 
   describe("create", () => {
-    it.only("should create and retrieve a supplier", async () => {
-      const res = await dao.create({
-        name: "Zod Ventures",
+    it("should create and retrieve a supplier", async () => {
+      const createdSupplier = await dao.create(suppliers[0]);
+      const foundSupplier = await dao.findById(createdSupplier.id);
+
+      expect(createdSupplier).toEqual(
+        expect.objectContaining({
+          id: createdSupplier.id,
+          name: foundSupplier.name,
+        })
+      );
+    });
+
+    it("should throw when inserting a supplier with null name", async () => {
+      await expect(
+        dao.create({
+          ...suppliers[1],
+          name: null as any,
+        })
+      ).rejects.toThrow(
+        /null value in column "name" of relation "suppliers" violates not-null constraint/i
+      );
+    });
+
+    it("should reject when creating a user with existing name", async () => {
+      await dao.create({
+        name: "Duplicate",
         email: "zod@gmail.com",
         phone: "0913478230",
         description: "Best home made crafters",
         address: "Alan road avenue",
       });
 
-      // const supplier = await dao.findById(res.id);
-      console.log(res);
-      // expect(res).toBe(
-      //   expect.objectContaining({ id: res.id, name: supplier.name })
-      // );
+      await expect(
+        dao.create({
+          ...suppliers[0],
+          name: "Duplicate",
+        })
+      ).rejects.toThrow(
+        /duplicate key value violates unique constraint \"suppliers_name_key\"/i
+      );
     });
 
-    // it("should throw on a failed creation", async () => {
-    //   (sql as jest.Mock).mockRejectedValueOnce(
-    //     mockPgError({
-    //       code: "23505",
-    //       message:
-    //         'duplicate key value violates unique constraint "supplier_name_key"',
-    //     })
-    //   );
+    it("should throw NOT_FOUND error for foreign key violation", async () => {
+      await expect(dao.findById(suppliers[1].id)).rejects.toThrow(
+        `Supplier with id '${suppliers[1].id}' not found.`
+      );
+    });
 
-    //   await expect(
-    //     dao.create({
-    //       name: "Duplicate",
-    //       email: "zod@gmail.com",
-    //       phone: "0913478230",
-    //       description: "Best home made crafters",
-    //       address: "Alan road avenue",
-    //     })
-    //   ).rejects.toThrow("SUPPLIER with this name already exists.");
-    // });
+    it("should throw SERVER_ERROR for unknown DB issues", async () => {
+      await expect(simulateServerError).rejects.toThrow("SERVER_ERROR");
+    });
 
-    // it("should throw NOT_FOUND error for foreign ket violation", async () => {
-    //   (sql as jest.Mock).mockRejectedValueOnce(
-    //     mockPgError({
-    //       code: "23503",
-    //       message:
-    //         'insert or update on table "suppliers" violates foreign key constraint',
-    //     })
-    //   );
+    it("should list all suppliers", async () => {
+      await dao.create(suppliers[0]);
 
-    //   await expect(dao.create(suppliers[0])).rejects.toThrow(
-    //     "Foreign key constraint failed. Related entity not found."
-    //   );
-    // });
+      const res = await dao.findAll();
+      expect(res.length).toBe(suppliers.length - 1);
+    });
 
-    // it("should throw VALIDATION_ERROR for null field", async () => {
-    //   (sql as jest.Mock).mockRejectedValueOnce(
-    //     mockPgError({
-    //       code: "23502",
-    //       message: 'null value in column "name" violates not-null constraint',
-    //     })
-    //   );
+    it("should return empty array", async () => {
+      await sql({ text: `DELETE FROM inventory.suppliers` });
 
-    //   await expect(dao.create(suppliers[0])).rejects.toThrow(
-    //     "A required field is missing or null."
-    //   );
-    // });
+      const res = await dao.findAll();
 
-    // it("should throw SAERVER_ERROR for unknown DB issues", async () => {
-    //   (sql as jest.Mock).mockRejectedValueOnce(
-    //     mockPgError({
-    //       code: "99999",
-    //       message: "some unknown database issue",
-    //     })
-    //   );
+      expect(res.length).toBe(0);
+      expect(res).toEqual([]);
+    });
 
-    //   await expect(dao.create(suppliers[0])).rejects.toThrow(
-    //     "Unexpected error occurred while working with SUPPLIER."
-    //   );
-    // });
+    it("should return data based on filter", async () => {
+      await dao.create(suppliers[0]);
+      await dao.create(suppliers[1]);
+
+      const filterredSuppliers = suppliers.filter((s) =>
+        s.email.includes("time")
+      );
+
+      const res = await dao.findAll({
+        filter: {
+          by: "EMAIL",
+          term: "timeless",
+        },
+      });
+
+      expect(res.length).toBe(filterredSuppliers.length);
+    });
+
+    it("should return empty array based on filter", async () => {
+      const res = await dao.findAll({
+        filter: {
+          by: "EMAIL",
+          term: "riad jack",
+        },
+      });
+
+      expect(res.length).toBe(0);
+    });
+
+    it("should return supplier by id", async () => {
+      const filterredSuppliers = suppliers.filter((s) => s.id == "1");
+      await dao.create(suppliers[0]);
+      await dao.create(suppliers[1]);
+
+      const res = await dao.findById("1");
+      expect(res.id.toString()).toBe(filterredSuppliers[0].id);
+    });
+
+    it("should thrown when no such supplier by id", async () => {
+      const id = "3";
+      const err = `Supplier with id '${id}' not found.`;
+
+      await expect(dao.findById(id)).rejects.toThrow(err);
+    });
+  });
+
+  describe("updateById", () => {
+    it("should thrown when no such supplier by id", async () => {
+      const id = "20003";
+      const err = `Supplier with id '${id}' not found.`;
+
+      await expect(
+        dao.updateById(id, { email: "new@email.com" })
+      ).rejects.toThrow(err);
+    });
+
+    it("should update a supplier by id", async () => {
+      const email = "new.rock@gmail.com";
+
+      const result = await dao.create(suppliers[0]);
+
+      const res = await dao.updateById(result.id, { email });
+
+      expect(res.email).toBe(email);
+    });
+  });
+
+  describe("deleteById", () => {
+    it("should thrown when no such supplier by id", async () => {
+      const id = "20003";
+      const err = `Delete failed for supplier id '${id}'`;
+
+      await expect(dao.deleteById(id)).rejects.toThrow(err);
+    });
+
+    it("should delete a supplier by id", async () => {
+      await dao.create(suppliers[0]);
+      const allSuppliers = await dao.findAll();
+
+      const res = await dao.deleteById(allSuppliers[0].id);
+      expect(res).toBeTruthy();
+    });
   });
 });
