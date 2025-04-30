@@ -132,6 +132,15 @@ export class SupplierDAO implements IDAO<SupplierModel> {
 
       return res.rows[0];
     } catch (err: any) {
+      logger.error(
+        SupplierDAO.name,
+        `findById failed for supplier id '${id}'`,
+        {
+          error: err,
+          stack: err.stack,
+          context: { entity: "SUPPLIER", operation: "findById" },
+        }
+      );
       if (err instanceof Error) {
         throw err;
       }
@@ -148,22 +157,21 @@ export class SupplierDAO implements IDAO<SupplierModel> {
     id: string,
     changes: Partial<SupplierModel>
   ): Promise<SupplierModel> {
-    logger.info("Supplier.updateById: ", changes);
+    logger.info("Supplier.updateById: ", { id, changes });
 
     const sets: string[] = [];
     const params: any[] = [];
     let index = 1;
 
     for (const [key, value] of Object.entries(changes)) {
-      sets.push(`${key} = $${index++}`);
+      sets.push(`${key} = ($${index++})`);
       params.push(value);
     }
 
-    const text = `
-    UPDATE invetory.suppliers
-    SET ${sets.join(", ")}
-    WHERE id = $${index}
-    `;
+    const text = `UPDATE inventory.suppliers SET ${sets.join(
+      ", "
+    )} WHERE id = ($${index})
+    RETURNING *`.trim();
 
     try {
       const supplier = await this.findById(id);
@@ -177,6 +185,12 @@ export class SupplierDAO implements IDAO<SupplierModel> {
 
       return res.rows[0];
     } catch (err: any) {
+      logger.error(SupplierDAO.name, `Update failed for supplier id '${id}'`, {
+        error: err,
+        stack: err.stack,
+        context: { entity: "SUPPLIER", operation: "updateById" },
+      });
+
       if (err instanceof Error) {
         throw err;
       }
