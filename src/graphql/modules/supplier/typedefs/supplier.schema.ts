@@ -13,6 +13,8 @@ export const supplierSchema = gql`
   type Mutation {
     "Create new supplier"
     createSupplier(s_input: CreateSupplierInput!): SupplierMutationResponse!
+    updateSupplier(s_input: UpdateSupplierInput!): SupplierMutationResponse!
+    deleteSupplier(id: ID!): SupplierMutationResponse
   }
 
   """
@@ -24,6 +26,19 @@ export const supplierSchema = gql`
     address: String!
     email: String!
     phone: String!
+  }
+
+  input UpdateSupplierInput {
+    id: ID!
+    update_input: UpdateSupplier
+  }
+
+  input UpdateSupplier {
+    name: String
+    description: String
+    address: String
+    email: String
+    phone: String
   }
 
   enum SupplierFilterEnum {
