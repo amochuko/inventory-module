@@ -19,7 +19,7 @@ export type CreateSupplierArgs = Omit<
 
 @Injectable()
 export class SupplierDAO implements IDAO<SupplierModel> {
-  async create(args: CreateSupplierArgs): Promise<SupplierModel> {
+  async insert(args: CreateSupplierArgs): Promise<SupplierModel> {
     logger.info(SupplierDAO.name, ": creating a supplier");
 
     try {

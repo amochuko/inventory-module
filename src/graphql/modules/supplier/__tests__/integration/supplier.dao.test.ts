@@ -31,7 +31,7 @@ describe("SupplierDAO", () => {
 
   describe("create", () => {
     it("should create and retrieve a supplier", async () => {
-      const createdSupplier = await dao.create(suppliers[0]);
+      const createdSupplier = await dao.insert(suppliers[0]);
       const foundSupplier = await dao.findById(createdSupplier.id);
 
       expect(createdSupplier).toEqual(
@@ -44,7 +44,7 @@ describe("SupplierDAO", () => {
 
     it("should throw when inserting a supplier with null name", async () => {
       await expect(
-        dao.create({
+        dao.insert({
           ...suppliers[1],
           name: null as any,
         })
@@ -54,7 +54,7 @@ describe("SupplierDAO", () => {
     });
 
     it("should reject when creating a user with existing name", async () => {
-      await dao.create({
+      await dao.insert({
         name: "Duplicate",
         email: "zod@gmail.com",
         phone: "0913478230",
@@ -63,7 +63,7 @@ describe("SupplierDAO", () => {
       });
 
       await expect(
-        dao.create({
+        dao.insert({
           ...suppliers[0],
           name: "Duplicate",
         })
@@ -83,7 +83,7 @@ describe("SupplierDAO", () => {
     });
 
     it("should list all suppliers", async () => {
-      await dao.create(suppliers[0]);
+      await dao.insert(suppliers[0]);
 
       const res = await dao.findAll();
       expect(res.length).toBe(suppliers.length - 1);
@@ -99,8 +99,8 @@ describe("SupplierDAO", () => {
     });
 
     it("should return data based on filter", async () => {
-      await dao.create(suppliers[0]);
-      await dao.create(suppliers[1]);
+      await dao.insert(suppliers[0]);
+      await dao.insert(suppliers[1]);
 
       const filterredSuppliers = suppliers.filter((s) =>
         s.email.includes("time")
@@ -129,8 +129,8 @@ describe("SupplierDAO", () => {
 
     it("should return supplier by id", async () => {
       const filterredSuppliers = suppliers.filter((s) => s.id == "1");
-      await dao.create(suppliers[0]);
-      await dao.create(suppliers[1]);
+      await dao.insert(suppliers[0]);
+      await dao.insert(suppliers[1]);
 
       const res = await dao.findById("1");
       expect(res.id.toString()).toBe(filterredSuppliers[0].id);
@@ -157,7 +157,7 @@ describe("SupplierDAO", () => {
     it("should update a supplier by id", async () => {
       const email = "new.rock@gmail.com";
 
-      const result = await dao.create(suppliers[0]);
+      const result = await dao.insert(suppliers[0]);
 
       const res = await dao.updateById(result.id, { email });
 
@@ -174,7 +174,7 @@ describe("SupplierDAO", () => {
     });
 
     it("should delete a supplier by id", async () => {
-      await dao.create(suppliers[0]);
+      await dao.insert(suppliers[0]);
       const allSuppliers = await dao.findAll();
 
       const res = await dao.deleteById(allSuppliers[0].id);
