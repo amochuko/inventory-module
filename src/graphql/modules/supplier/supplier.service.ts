@@ -38,8 +38,9 @@ export class SupplierService implements IDAO<SupplierModel> {
     changes: Partial<SupplierModel>
   ): Promise<SupplierModel> {
     const supplier = await this.repo.findById(id);
+
     const newUpdate = {
-      ...supplier,
+      ...supplier.toPersistence(),
       ...changes,
     };
 
