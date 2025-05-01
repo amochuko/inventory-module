@@ -4,30 +4,17 @@ export const productSchema = gql`
   scalar Date
 
   type Query {
-    products(filter: ProductFilterInputArgs): [Product!]!
+    products: [Product!]!
     product(id: ID!): Product
   }
 
   type Mutation {
-    createProduct(args: ProductInputArgs!): Product!
-    updateProduct(args: ProductUpdateInputArgs!): UpdateProductMutationResponse!
+    createProduct(inputs: ProductInputArgs!): Product!
+    updateProduct(
+      inputs: ProductUpdateInputArgs!
+    ): UpdateProductMutationResponse!
     deleteProduct(id: ID!): UpdateProductMutationResponse!
   }
-
-  # interface IProduct {
-  #   barcode_number: String
-  #   qrcode: String
-  #   name: String!
-  #   description: String!
-  #   category_id: ID!
-  #   supplier_id: ID!
-  #   cost_price: Float!
-  #   selling_price: Float!
-  #   stock_quantity: Int!
-  #   stock_keeping_unit: String!
-  #   created_at: Date!
-  #   updated_at: Date
-  # }
 
   """
   Product of the content
@@ -44,7 +31,10 @@ export const productSchema = gql`
     selling_price: Float!
     stock_quantity: Int!
     stock_keeping_unit: String!
+    manufactured_date: Date
+    best_before_date: Date
     created_at: Date!
+    updated_at: Date
   }
 
   """
@@ -56,7 +46,7 @@ export const productSchema = gql`
     take: Int
   }
 
-  input ProductInputArgs implements IProduct {
+  input ProductInputArgs {
     barcode_number: String
     qrcode: String
     name: String!
@@ -75,13 +65,7 @@ export const productSchema = gql`
     product: ProductInputArgs!
   }
 
-
-  # extend interface CommonType {
-  #   created_at: Date!
-  #   updated_at: Date
-  # }
-
-  type UpdateProductMutationResponse implements MutationResponse {
+  type UpdateProductMutationResponse {
     code: Int!
     success: Boolean!
     message: String!
