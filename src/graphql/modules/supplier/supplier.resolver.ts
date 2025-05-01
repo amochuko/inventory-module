@@ -18,7 +18,32 @@ export const supplierResolver: SupplierModule.Resolvers = {
     },
   },
   Mutation: {
+    createSupplier: async (_, { s_input }, ctx) => {
+      logger.info("Resolving create supplier.");
+      try {
+        const result = await ctx.injector.get(SupplierService).insert(s_input);
 
+        return {
+          code: 200,
+          message: "Successfully created Supplier",
+          success: true,
+          supplier: result,
+        };
+      } catch (err: any) {
+        logger.error("Supplier creation failed", err);
+
+        const isAppError = err instanceof AppError;
+
+        return {
+          code: 400,
+          message: isAppError
+            ? err.message
+            : "Unexpected error while creating supplier.",
+          success: false,
+          supplier: null,
+        };
+      }
+    },
   },
   Date: DateScalar,
 };
