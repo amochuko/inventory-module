@@ -1,7 +1,6 @@
 import { Injectable } from "graphql-modules";
 import { createLogger } from "graphql-yoga";
 
-import { handlePostgresError } from "../../../common/database/dbErrorHandler";
 import { sql } from "../../../common/database/sqlConnection";
 import { catchErrorHandler } from "../../../error/catchErrorHandler";
 import { NotFoundError } from "../../../error/not-found.error";
@@ -20,7 +19,7 @@ export type CreateSupplierArgs = Omit<
 @Injectable()
 export class SupplierDAO implements IDAO<SupplierModel> {
   async insert(args: CreateSupplierArgs): Promise<SupplierModel> {
-    logger.info(SupplierDAO.name, ": creating a supplier");
+    logger.info(SupplierDAO.name, ": insert a supplier");
 
     try {
       const res = await sql({
@@ -51,7 +50,7 @@ export class SupplierDAO implements IDAO<SupplierModel> {
       logger.error(SupplierDAO.name, "DB error occurred", {
         error: err,
         stack: err.stack,
-        context: { entity: "SUPPLIER", operation: "create" },
+        context: { entity: "SUPPLIER", operation: "insert" },
       });
 
       throw catchErrorHandler(err, "SUPPLIER");
@@ -61,6 +60,7 @@ export class SupplierDAO implements IDAO<SupplierModel> {
   async findAll(
     args?: SupplierModule.SupplierFilterInput
   ): Promise<SupplierModel[]> {
+    logger.info("SupplierDao.findAll: ", { args });
     try {
       const conditions: any[] = [];
       let params: any[] = [];
@@ -98,15 +98,13 @@ export class SupplierDAO implements IDAO<SupplierModel> {
         params.push(args.filter.take);
       }
 
-      logger.info("findAll: ", { text, params });
-
       const res = await sql({ text, params });
 
-      if (res.rowCount && res.rowCount > 0) {
-        return res.rows.map(SupplierModel.rebuildFromPersistence);
+      if (res.rowCount && res.rowCount === 0) {
+        return [];
       }
 
-      return [];
+      return res.rows.map(SupplierModel.rebuildFromPersistence);
     } catch (err: any) {
       logger.error(SupplierDAO.name, "DB error occurred", {
         error: err,
@@ -119,6 +117,7 @@ export class SupplierDAO implements IDAO<SupplierModel> {
   }
 
   async findById(id: string): Promise<SupplierModel> {
+    logger.info("SupplierDao.findById: ", { id });
     try {
       const res = await sql({
         text: `SELECT * FROM inventory.suppliers 
@@ -141,15 +140,8 @@ export class SupplierDAO implements IDAO<SupplierModel> {
           context: { entity: "SUPPLIER", operation: "findById" },
         }
       );
-      if (err instanceof Error) {
-        throw err;
-      }
 
-      if (err.code) {
-        throw handlePostgresError(err, "SUPPLIER");
-      }
-
-      throw new Error(err);
+      throw catchErrorHandler(err, "SUPPLIER");
     }
   }
 
@@ -157,7 +149,7 @@ export class SupplierDAO implements IDAO<SupplierModel> {
     id: string,
     changes: Partial<SupplierModel>
   ): Promise<SupplierModel> {
-    logger.info("Supplier.updateById: ", { id, changes });
+    logger.info("SupplierDao.updateById: ", { id, changes });
 
     const sets: string[] = [];
     const params: any[] = [];
@@ -191,19 +183,13 @@ export class SupplierDAO implements IDAO<SupplierModel> {
         context: { entity: "SUPPLIER", operation: "updateById" },
       });
 
-      if (err instanceof Error) {
-        throw err;
-      }
-
-      if (err.code) {
-        throw handlePostgresError(err, "SUPPLIER");
-      }
-
-      throw new Error(err);
+      throw catchErrorHandler(err, "SUPPLIER");
     }
   }
 
   async deleteById(id: string): Promise<boolean | null> {
+    logger.info("SupplierDao.deleteById: ", { id });
+
     try {
       const res = await sql({
         text: `DELETE FROM inventory.suppliers s
