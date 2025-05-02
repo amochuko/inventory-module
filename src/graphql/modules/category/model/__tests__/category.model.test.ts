@@ -1,4 +1,5 @@
-import ValidationError from "../../../../../../error/validation.error";
+
+import ValidationError from "../../../../../error/validation.error";
 import { CategoryModel } from "../category.model";
 
 describe("CategoryModel", () => {
