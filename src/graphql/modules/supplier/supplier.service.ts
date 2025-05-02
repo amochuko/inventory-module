@@ -1,12 +1,11 @@
 import { Injectable } from "graphql-modules";
-import { IDAO } from "../interface/dao.interface";
 import { SupplierModule } from "./generated-types/module-types";
 import { SupplierModel } from "./model/supplier.model";
 import { CreateSupplierArgs } from "./supplier.dao";
 import { SupplierRepo } from "./supplier.repo";
 
 @Injectable()
-export class SupplierService implements IDAO<SupplierModel> {
+export class SupplierService {
   constructor(private repo: SupplierRepo) {}
 
   async insert(args: CreateSupplierArgs): Promise<SupplierModel> {
