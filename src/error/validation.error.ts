@@ -1,14 +1,7 @@
-import AppError from "./app.error";
-import { ErrorCodes } from "./error.codes";
+import AppError, { AppErrorOptions } from "./app.error";
 
 // TODO: Update AppError to use this format
-type ValidationErrorOptions = {
-  extensions: {
-    code: ErrorCodes;
-    statusCode?: number;
-    errors: Record<string, any> | any[];
-  };
-};
+interface ValidationErrorOptions extends AppErrorOptions {}
 
 /**
  * This is the ValidationError used to handle neccessary exception
@@ -18,7 +11,6 @@ export default class ValidationError extends AppError {
     msg: string = "Invalid data provided",
     options: ValidationErrorOptions
   ) {
-    super(msg, options.extensions.code, options.extensions.statusCode);
-
+    super(msg, options);
   }
 }

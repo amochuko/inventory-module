@@ -1,23 +1,23 @@
-export enum ErrorCodes {
-  CREATION_FAILED = "CREATION_FAILED",
-  FETCH_FAILED = "FETCH_FAILED",
-  NONE_NULL = "NONE_NULL",
-  NOT_FOUND = "NOT_FOUND",
-  DUPLICATE = "DUPLICATE",
-  UNKNOWN = "UNKNOWN",
-  VALIDATION_ERROR = "VALIDATION_ERROR",
-  SERVER_ERROR = "SERVER_ERROR",
-  APP_ERROR = "APP_ERROR",
-}
+import { ErrorCodes } from "./error.codes";
+
+// TODO: Update AppError to use this format
+export interface AppErrorOptions  {
+  extensions: {
+    code: ErrorCodes;
+    statusCode?: number;
+    errors: Record<string, any>
+  };
+};
 
 export default class AppError extends Error {
-  public statusCode: number;
   public code: ErrorCodes;
+  public readonly name: string;
+  public readonly statusCode: number;
 
-  constructor(message: string, code = ErrorCodes.APP_ERROR, statusCode = 500) {
+  constructor(message: string, options: AppErrorOptions) {
     super(message);
-    this.code = code;
-    this.statusCode = statusCode;
+    this.code = options.extensions.code;
+    this.statusCode = options.extensions.statusCode || 500;
     this.name = this.constructor.name;
 
     Error.captureStackTrace(this, this.constructor);

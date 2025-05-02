@@ -1,16 +1,26 @@
-import AppError, { ErrorCodes } from "./app.error";
+import AppError, { AppErrorOptions } from "./app.error";
+import { ErrorCodes } from "./error.codes";
 
-type NotFoundErrorType = {
-  resource: string;
-  statusCode?: number;
-  id?: string | number;
-};
+interface NotFoundErrorOptions extends AppErrorOptions {
+  exensions: {
+    errors: {
+      id: string;
+      entity: string;
+    };
+  };
+}
+
 export class NotFoundError extends AppError {
-  constructor({ resource, statusCode = 400, id }: NotFoundErrorType) {
-    super(
-      `${resource} ${id ? `with id '${id}' ` : ""}not found.`.trim(),
-      ErrorCodes.NOT_FOUND,
-      statusCode
-    );
+  constructor(msg = "", options: NotFoundErrorOptions) {
+    const { id, entity } = options.exensions.errors;
+
+    msg = id ? `${entity} with ID ${id} not found.` : `${entity} not found`;
+    super(msg, {
+      extensions: {
+        code: ErrorCodes.NOT_FOUND,
+        statusCode: 404,
+        errors: {},
+      },
+    });
   }
 }
