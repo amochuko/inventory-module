@@ -174,5 +174,20 @@ export class CategoryModel extends BaseModel<CreateCategoryArgs> {
     );
   }
 
+  override toPersistence(): CreateCategoryInput {
+    return {
+      name: this._name,
+      description: this._description,
+    };
+  }
 
+  override toJson(): Record<string, any> {
+    return {
+      id: this._id,
+      name: this._name,
+      description: this._description,
+      createdAt: this._createdAt,
+      updatedAt: this._updatedAt,
+    };
+  }
 }
