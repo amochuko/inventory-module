@@ -2,7 +2,9 @@ import { Injectable } from "graphql-modules";
 import { createLogger } from "graphql-yoga";
 
 import { sql } from "../../../common/database/sqlConnection";
+import AppError from "../../../error/app.error";
 import { catchErrorHandler } from "../../../error/catchErrorHandler";
+import { ErrorCodes } from "../../../error/error.codes";
 import { NotFoundError } from "../../../error/not-found.error";
 import { Supplier } from "../../generated-types/graphql";
 import { IDAO } from "../interface/dao.interface";
@@ -118,6 +120,7 @@ export class SupplierDAO implements IDAO<SupplierModel> {
 
   async findById(id: string): Promise<SupplierModel> {
     logger.info("SupplierDao.findById: ", { id });
+
     try {
       const res = await sql({
         text: `SELECT * FROM inventory.suppliers 
@@ -126,7 +129,15 @@ export class SupplierDAO implements IDAO<SupplierModel> {
       });
 
       if (res.rowCount === 0) {
-        throw new NotFoundError({ resource: "Supplier", id });
+        throw new NotFoundError(`Supplier with id '${id}' not found.`, {
+          extensions: {
+            code: ErrorCodes.NOT_FOUND,
+            errors: {
+              entity: "Supplier",
+              id,
+            },
+          },
+        });
       }
 
       return res.rows[0];
@@ -172,7 +183,12 @@ export class SupplierDAO implements IDAO<SupplierModel> {
       const res = await sql({ text, params });
 
       if (!res.rowCount) {
-        throw new Error(`Update failed for supplier id '${id}'`);
+        throw new AppError(`Update failed for supplier id '${id}'`, {
+          extensions: {
+            code: ErrorCodes.APP_ERROR,
+            errors: {},
+          },
+        });
       }
 
       return res.rows[0];
@@ -199,7 +215,12 @@ export class SupplierDAO implements IDAO<SupplierModel> {
       });
 
       if (!res.rowCount) {
-        throw new Error(`Delete failed for supplier id '${id}'`);
+        throw new AppError(`Delete failed for supplier id '${id}'`, {
+          extensions: {
+            code: ErrorCodes.APP_ERROR,
+            errors: {},
+          },
+        });
       }
 
       return res.rowCount > 0;
