@@ -2,9 +2,10 @@ import AppError, { AppErrorOptions } from "./app.error";
 import { ErrorCodes } from "./error.codes";
 
 interface NotFoundErrorOptions extends AppErrorOptions {
-  exensions: {
+  extensions: {
+    code: ErrorCodes;
     errors: {
-      id: string;
+      id?: string;
       entity: string;
     };
   };
@@ -12,7 +13,7 @@ interface NotFoundErrorOptions extends AppErrorOptions {
 
 export class NotFoundError extends AppError {
   constructor(msg = "", options: NotFoundErrorOptions) {
-    const { id, entity } = options.exensions.errors;
+    const { id, entity } = options.extensions.errors;
 
     msg = id ? `${entity} with ID ${id} not found.` : `${entity} not found`;
     super(msg, {

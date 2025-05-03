@@ -1,13 +1,19 @@
-import AppError, { ErrorCodes } from "./app.error";
+import AppError, { AppErrorOptions } from "./app.error";
+import { ErrorCodes } from "./error.codes";
 
+interface DuplicateErrorOptions extends AppErrorOptions {
+  extensions: {
+    code: ErrorCodes;
+    errors: {
+      id?: string;
+      entity: string;
+    };
+  };
+}
 export class DuplicateError extends AppError {
-  constructor(
-    resource: string,
-    code: ErrorCodes,
-    statusCode: number,
-    id?: string | number
-  ) {
-    super(`${resource} with this name already exists`.trim()), code, statusCode;
+  constructor(msg = "", options: DuplicateErrorOptions) {
+    const { entity, id } = options.extensions.errors;
+    msg += `${entity} with this name already exists`.trim();
+    super(msg, options);
   }
 }
-
