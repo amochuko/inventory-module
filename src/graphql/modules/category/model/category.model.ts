@@ -163,5 +163,16 @@ export class CategoryModel extends BaseModel<CreateCategoryArgs> {
     return new CategoryModel("", dto.name, dto.description, null, null);
   }
 
+  // Factory for suppliers loaded from DB
+  static rebuildFromPersistence(data: Category): CategoryModel {
+    return new CategoryModel(
+      data.id,
+      data.name,
+      data.description,
+      new Date(data.created_at),
+      new Date(data.updated_at)
+    );
+  }
+
 
 }
