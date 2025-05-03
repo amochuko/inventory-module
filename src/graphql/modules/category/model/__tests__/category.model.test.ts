@@ -1,4 +1,3 @@
-
 import ValidationError from "../../../../../error/validation.error";
 import { CategoryModel } from "../category.model";
 
@@ -21,13 +20,24 @@ describe("CategoryModel", () => {
     expect(name).toBe("electronics");
   });
 
+  it("should return the model from a dto", () => {
+    const categoryModel = CategoryModel.createFromDTO({
+      name: "Jack Mouse",
+      description: "This is the Jack screw brand.",
+    });
+
+    expect(categoryModel).toEqual(
+      expect.objectContaining({ name: "Jack Mouse" })
+    );
+  });
+
   it("should return abbrev code", () => {
     const abbrevCode = model.abbrevCode;
     expect(abbrevCode).toBe("ELE-11");
   });
 
   it("should validate insert input", () => {
-    const validated = model.validate();
+    const validated = model.validateInsertData();
 
     expect(validated.data).toEqual(
       expect.objectContaining({
@@ -37,9 +47,15 @@ describe("CategoryModel", () => {
     );
   });
 
-  it("should throw if validation fails", () => {
+  it("should throw if validation fails for insert input", () => {
     const model = new CategoryModel("12", "", "", new Date(), new Date());
 
-    expect(() => model.validate()).toThrow(ValidationError);
+    expect(() => model.validateInsertData()).toThrow(ValidationError);
+  });
+
+  it("should throw if validation fails for update input", () => {
+    const model = new CategoryModel("12", "", "", new Date(), new Date());
+
+    expect(() => model.validateUpdateData()).toThrow(ValidationError);
   });
 });
