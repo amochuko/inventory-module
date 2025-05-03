@@ -2,6 +2,8 @@ import { createLogger } from "graphql-yoga";
 import { z } from "zod";
 import { ErrorCodes } from "../../../../error/error.codes";
 import ValidationError from "../../../../error/validation.error";
+import { Category } from "../../../generated-types/graphql";
+import { BaseModel } from "../../../types/base.model";
 
 const DeleteCategoryArgSchema = z.object({
   id: z.coerce
@@ -16,8 +18,22 @@ const UpdateCategoryArgSchema = z.object({
     .trim()
     .regex(/^\d+$/, "Category ID must be numeric string"),
   body: z.object({
-    name: z.string().trim().optional(),
-    description: z.string().trim().optional(),
+    name: z
+      .string({
+        required_error: "Description must not be empty",
+        invalid_type_error: "Description must be a string",
+      })
+      .trim()
+      .min(2, { message: "Name is required." })
+      .optional(),
+    description: z
+      .string({
+        required_error: "Description must not be empty",
+        invalid_type_error: "Description must be a string",
+      })
+      .trim()
+      .min(1, { message: "Description is required." })
+      .optional(),
   }),
 });
 
@@ -40,14 +56,18 @@ const CreateCategoryArgSchema = z.object({
 
 const logger = createLogger("debug");
 
-export class CategoryModel {
+type CreateCategoryInput = z.infer<typeof CreateCategoryArgSchema>;
+type CreateCategoryArgs = CreateCategoryInput;
+
+export class CategoryModel extends BaseModel<CreateCategoryArgs> {
   constructor(
     private _id: string,
     private _name: string,
     private _description: string,
-    private _createdAt: Date,
-    private _updatedAt: Date
+    private _createdAt: Date | null,
+    private _updatedAt: Date | null
   ) {
+    super();
     this._touch();
   }
 
@@ -71,7 +91,32 @@ export class CategoryModel {
     return this._updatedAt;
   }
 
-  validate() {
+  validateInsertData() {
+    const validation = CreateCategoryArgSchema.safeParse({
+      name: this.name,
+      description: this.description,
+    });
+
+    if (!validation.success) {
+      const validationErrors = validation.error.format();
+
+      logger.warn(
+        "Validation failed for createCategory args",
+        validationErrors
+      );
+
+      throw new ValidationError("Invalid input for create category", {
+        extensions: {
+          code: ErrorCodes.VALIDATION_ERROR,
+          errors: validationErrors,
+        },
+      });
+    }
+
+    return validation;
+  }
+
+  validateUpdateData() {
     const validation = CreateCategoryArgSchema.safeParse({
       name: this.name,
       description: this.description,
@@ -113,4 +158,6 @@ export class CategoryModel {
   private _touch() {
     this._updatedAt = new Date();
   }
+
+
 }
