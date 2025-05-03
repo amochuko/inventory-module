@@ -159,5 +159,9 @@ export class CategoryModel extends BaseModel<CreateCategoryArgs> {
     this._updatedAt = new Date();
   }
 
+  static createFromDTO(dto: CreateCategoryInput): CategoryModel {
+    return new CategoryModel("", dto.name, dto.description, null, null);
+  }
+
 
 }
