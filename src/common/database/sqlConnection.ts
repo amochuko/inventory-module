@@ -4,22 +4,31 @@ import env from "../utils/env";
 let pool: pg.Pool;
 
 const nodeEnv = process.env.NODE_ENV;
+
 export const dbClient = {
   getPool: () => {
+    const testConnStr = env.PGDB_TEST_CONNECTION_STRING;
+    const devConnStr = env.PGDB_DEV_CONNECTION_STRING;
+    const prodConnStr = env.PGDB_PRO_CONNECTION_STRING;
+
     if (!pool) {
       pool = new pg.Pool({
         connectionString:
           nodeEnv === "test"
-            ? env.PGDB_TEST_CONNECTION_STRING
+            ? testConnStr
             : nodeEnv === "development"
-            ? env.PGDB_DEV_CONNECTION_STRING
-            : env.PGDB_PRO_CONNECTION_STRING,
+            ? devConnStr
+            : prodConnStr,
       });
     }
 
     return pool;
   },
 };
+
+dbClient.getPool().on("connect", async (client) => {
+  await client.query(`SET search_path TO inventory;`);
+});
 
 dbClient.getPool().on("error", (err) => {
   console.log("Unexpected error on idle client: ", err);
@@ -39,8 +48,12 @@ export async function sql<T extends pg.QueryResultRow = any>(args: SQLArgs) {
     return result;
   } catch (err) {
     console.error("❌ Query error:", err);
+    
+    if (err instanceof Error) {
+      throw err;
+    }
 
-    throw err;
+    throw new Error(err as any);
   } finally {
     client.release();
     console.log("✅ Client released");
