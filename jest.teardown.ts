@@ -7,6 +7,7 @@ export default async () => {
   console.log("waitingCount:", dbClient.getPool().waitingCount);
 
   console.log("🧹 Global teardown: closing dbClient pool...");
-  await dbClient.getPool().end();
+
+  await dbClient.getPool().end(); // Gracefully close DB connections
   console.log("✅ dbClient pool closed");
 };
