@@ -3,17 +3,17 @@ import { createLogger } from "graphql-yoga";
 
 import { sql } from "../../../common/database/sqlConnection";
 import { Category, FilterCategoryInput } from "../../generated-types/graphql";
+import { IDAO } from "../interface/dao.interface";
 import {
   CategoryCreationError,
   CategoryFindAllError,
   CategoryNotFoundError,
 } from "./category.error";
-import { ICategory } from "./category.interface";
 
 const logger = createLogger("error");
 
 @Injectable()
-export default class CategoryDAO implements ICategory {
+export default class CategoryDAO implements IDAO<Category> {
   //
   async findAll(args?: FilterCategoryInput): Promise<Category[]> {
     try {
@@ -48,6 +48,7 @@ export default class CategoryDAO implements ICategory {
 
       return res.rows;
     } catch (err) {
+      logger.error(CategoryDAO.name, err);
       if (err instanceof Error) {
         throw err.message;
       }
@@ -64,9 +65,13 @@ export default class CategoryDAO implements ICategory {
         params: [id],
       });
 
+      if (!result.rowCount) {
+        throw new CategoryNotFoundError();
+      }
+
       return result.rows[0];
     } catch (err) {
-      logger.error(err);
+      logger.error(CategoryDAO.name, err);
       throw new CategoryNotFoundError();
     }
   }
@@ -76,20 +81,25 @@ export default class CategoryDAO implements ICategory {
       const keys = Object.keys(body) as (keyof typeof body)[];
 
       const setClause = keys.map((k, i) => `${k} = ($${i + 1})`).join(", ");
-
       const values = keys.map((k) => body[k]);
 
+      const query = `UPDATE inventory.categories
+                      SET ${setClause}
+                      WHERE id = ($${keys.length + 1})
+                      RETURNING *`;
+
       const result = await sql({
-        text: `UPDATE inventory.categories
-                    SET ${setClause}
-                WHERE id = ($${keys.length + 1})
-                RETURNING *`,
+        text: query,
         params: [...values, id],
       });
 
+      if (!result.rowCount) {
+        throw new CategoryNotFoundError(`Category with id '${id}' not found.`);
+      }
+
       return result.rows[0];
     } catch (err) {
-      logger.error(err);
+      logger.error(CategoryDAO.name, err);
       throw new CategoryNotFoundError();
     }
   }
@@ -98,22 +108,23 @@ export default class CategoryDAO implements ICategory {
     try {
       const res = await sql({
         text: `DELETE FROM inventory.categories
-                              WHERE id = ($1)
-                            `,
+                WHERE id = ($1)
+                RETURNING *`,
         params: [id],
       });
 
-      if (res.rowCount) {
-        return true;
+      if (!res.rowCount) {
+        throw new CategoryNotFoundError(`Category with id '${id}' not found.`);
       }
 
-      throw new CategoryNotFoundError(`No category with id '${id}`);
+      return true;
     } catch (err) {
+      logger.error(CategoryDAO.name, err);
       throw new CategoryNotFoundError();
     }
   }
 
-  async create(
+  async insert(
     args: Pick<Category, "abbrev_code" | "name" | "description">
   ): Promise<Category> {
     try {
@@ -128,10 +139,16 @@ export default class CategoryDAO implements ICategory {
 
       return result.rows[0];
     } catch (err: any) {
+      logger.error(CategoryDAO.name, err);
+
       const msg = err?.message || "";
 
       if (/duplicate key value.*categories_name_key/i.test(msg)) {
         throw new CategoryCreationError("Category name already exists.");
+      }
+
+      if (/violates check constraint*categories_name_non_empty/i.test(msg)) {
+        throw new CategoryCreationError("Category name must not be empty.");
       }
 
       if (/relation ".*" does not exist/i.test(msg)) {
@@ -139,7 +156,6 @@ export default class CategoryDAO implements ICategory {
         throw new CategoryCreationError("DB domain error.");
       }
 
-      logger.error(CategoryDAO.name, err);
       throw new CategoryCreationError(err);
     }
   }
