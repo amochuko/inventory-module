@@ -1,8 +1,9 @@
 import { Injectable } from "graphql-modules";
+import { DatabaseError } from "../../../error/database.error";
 import { IDAO } from "../interface/dao.interface";
 import { SupplierModule } from "./generated-types/module-types";
 import { SupplierModel } from "./model/supplier.model";
-import { CreateSupplierArgs, SupplierDAO } from "./supplier.dao";
+import { SupplierDAO } from "./supplier.dao";
 
 @Injectable()
 export class SupplierRepo implements IDAO<SupplierModel> {
@@ -48,7 +49,7 @@ export class SupplierRepo implements IDAO<SupplierModel> {
       const created = await this.dao.insert(data);
 
       if (!created) {
-        throw new Error("Failed to insert new supplier");
+        throw new DatabaseError("Failed to add new supplier");
       }
 
       return SupplierModel.rebuildFromPersistence(created);
@@ -57,7 +58,9 @@ export class SupplierRepo implements IDAO<SupplierModel> {
       const updated = await this.dao.updateById(supplier.id, data);
 
       if (!updated) {
-        throw new Error(`Failed to updated supplier with ID: ${supplier.id}`);
+        throw new DatabaseError(
+          `Failed to updated supplier with ID: ${supplier.id}`
+        );
       }
 
       return SupplierModel.rebuildFromPersistence(updated);
