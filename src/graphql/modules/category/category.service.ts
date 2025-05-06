@@ -9,6 +9,7 @@ import { CategoryModel } from "./model/category.model";
 import {
   CategoryCreateArgs,
   CategoryCreateArgSchema,
+  CategoryIdSchema,
 } from "./validation/category.schema";
 
 @Injectable()
@@ -41,8 +42,8 @@ export class CategoryService {
     return await this.categoryRepo.updateById(id, body);
   }
 
-  async deleteById(id: string): Promise<boolean> {
-    //TODO: validate args input
+  async deleteById(id: string): Promise<boolean | null> {
+    id = this._validateId(id)["id"];
     return await this.categoryRepo.deleteById(id);
   }
 
@@ -57,5 +58,16 @@ export class CategoryService {
     const model = CategoryModel.createFromDTO(validated);
 
     return await this.categoryRepo.insert(model);
+  }
+
+  private _validateId(id: string) {
+    const validated = validateOrThrow({
+      schema: CategoryIdSchema,
+      input: id,
+      errorMsg: "Validation failed for id as valid UUID",
+      errorCode: ErrorCodes.VALIDATION_ERROR,
+    });
+
+    return validated;
   }
 }
