@@ -10,6 +10,7 @@ import {
   CategoryCreateArgs,
   CategoryCreateArgSchema,
   CategoryIdSchema,
+  CategoryUpdateArgSchema,
 } from "./validation/category.schema";
 
 @Injectable()
@@ -30,16 +31,25 @@ export class CategoryService {
   async updateById(
     id: string,
     body: Partial<CategoryModule.Category>
-  ): Promise<Category> {
-    //TODO: validate args input
+  ): Promise<CategoryModel> {
+    id = this._validateId(id)["id"];
 
-    if (body.name) {
-      // update abbre_code
-      body.abbrev_code = getAbbrevationCodeFromName(body.name);
-      return await this.categoryRepo.updateById(id, body);
-    }
+    const validated = validateOrThrow({
+      schema: CategoryUpdateArgSchema,
+      input: { id, body },
+      errorMsg: "Validation failed for update args",
+      errorCode: ErrorCodes.VALIDATION_ERROR,
+    });
 
-    return await this.categoryRepo.updateById(id, body);
+    const category = await this.categoryRepo.findById(id);
+    category.mergeUpdate(validated!);
+
+    const newUpdate = {
+      ...category.toPersistence(),
+      ...validated,
+    };
+
+    return await this.categoryRepo.updateById(id, newUpdate);
   }
 
   async deleteById(id: string): Promise<boolean | null> {
