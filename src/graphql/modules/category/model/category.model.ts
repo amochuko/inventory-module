@@ -83,6 +83,7 @@ export class CategoryModel extends BaseModel<CategoryCreateArgs> {
       this._description = data.description;
     }
 
+    this._abbrev_code = this._getAbbrevationCodeFromName(this._name);
     this._touch();
   }
 
