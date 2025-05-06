@@ -2,28 +2,29 @@ import { Injectable } from "graphql-modules";
 import { createLogger } from "graphql-yoga";
 
 import { sql } from "../../../common/database/sqlConnection";
-import { Category, FilterCategoryInput } from "../../generated-types/graphql";
+import { Category } from "../../generated-types/graphql";
 import { IDAO } from "../interface/dao.interface";
 import {
   CategoryCreationError,
   CategoryFindAllError,
   CategoryNotFoundError,
 } from "./category.error";
+import { CategoryFilterArgs } from "./validation/category.schema";
 
 const logger = createLogger("error");
 
 @Injectable()
 export default class CategoryDAO implements IDAO<Category> {
   //
-  async findAll(args?: FilterCategoryInput): Promise<Category[]> {
+  async findAll(args?: CategoryFilterArgs): Promise<Category[]> {
     try {
       const conditions: string[] = [];
       const params: any[] = [];
       let paramIndex = 1;
 
-      if (args?.filterByName) {
+      if (args?.filter?.byName) {
         conditions.push(`name ILIKE ($${paramIndex++})`);
-        params.push(`${args.filterByName}%`);
+        params.push(`${args.filter.byName}%`);
       }
 
       let text = `SELECT * FROM inventory.categories`;
@@ -34,14 +35,14 @@ export default class CategoryDAO implements IDAO<Category> {
 
       text += ` ORDER BY id ASC`;
 
-      if (args?.take) {
+      if (args?.filter?.take) {
         text += ` LIMIT ($${paramIndex++})`;
-        params.push(args.take);
+        params.push(args.filter.take);
       }
 
-      if (args?.skip) {
+      if (args?.filter?.skip) {
         text += ` OFFSET ($${paramIndex++})`;
-        params.push(args.skip);
+        params.push(args.filter.skip);
       }
 
       const res = await sql({ text, params });
