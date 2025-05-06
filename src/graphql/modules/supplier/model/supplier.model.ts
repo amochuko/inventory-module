@@ -2,7 +2,6 @@
 
 import ValidationError from "../../../../error/validation.error";
 import { CreateSupplierInput } from "../../../generated-types/graphql";
-import { CreateSupplierArgs } from "../supplier.dao";
 
 export class SupplierModel {
   constructor(
@@ -139,7 +138,10 @@ export class SupplierModel {
     };
   }
 
-  toPersistence(): CreateSupplierArgs {
+  toPersistence(): Pick<
+    SupplierModel,
+    "name" | "email" | "address" | "description" | "phone"
+  > {
     return {
       name: this._name,
       email: this._email,
