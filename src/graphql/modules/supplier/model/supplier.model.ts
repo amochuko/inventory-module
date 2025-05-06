@@ -2,6 +2,7 @@
 
 import ValidationError from "../../../../error/validation.error";
 import { CreateSupplierInput } from "../../../generated-types/graphql";
+import { CreateSupplierArgs } from "../supplier.dao";
 
 export class SupplierModel {
   constructor(
@@ -50,24 +51,31 @@ export class SupplierModel {
   }
 
   updateEmail(newEmail: string) {
+    this._updateEmail(newEmail);
+
+    this._email = newEmail;
+    this._touch();
+  }
+
+  private _updateEmail(newEmail: string) {
     if (!this.isValidEmail(newEmail)) {
       throw new ValidationError("Invalid email format.");
     }
-
-    this._email = newEmail;
-    this.touch();
   }
 
-  updatePhone(newPhone: string) {
+  private _updatePhone(newPhone: string) {
     if (!/^\d{10,15}$/.test(newPhone)) {
       throw new ValidationError("Phone must be 10-15 digits.");
     }
+  }
+  updatePhone(newPhone: string) {
+    this._updatePhone(newPhone);
 
     this._phone = newPhone;
-    this.touch();
+    this._touch();
   }
 
-  private touch() {
+  private _touch() {
     this._updatedAt = new Date();
   }
 
@@ -149,5 +157,35 @@ export class SupplierModel {
       description: this._description,
       phone: this._phone,
     };
+  }
+
+  mergeUpdate(data: Partial<CreateSupplierArgs>) {
+    if (data.name !== undefined) {
+      if (data.name.trim() === "") {
+        throw new ValidationError(`Name cannot be empty`);
+      }
+
+      this._name = data.name;
+    }
+
+    if (data.email !== undefined) {
+      this._updateEmail(data.email);
+      this._email = data.email;
+    }
+
+    if (data.phone !== undefined) {
+      this._updatePhone(data.phone);
+      this._phone = data.phone;
+    }
+
+    if (data.description !== undefined) {
+      this._description = data.description;
+    }
+
+    if (data.address !== undefined) {
+      this._address = data.address;
+    }
+
+    this._touch();
   }
 }
