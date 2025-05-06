@@ -4,14 +4,13 @@ import { IDAO } from "../interface/dao.interface";
 import { SupplierModule } from "./generated-types/module-types";
 import { SupplierModel } from "./model/supplier.model";
 import { SupplierDAO } from "./supplier.dao";
+import { SupplierFilterInputArgs } from "./validation/supplier.schema";
 
 @Injectable()
 export class SupplierRepo implements IDAO<SupplierModel> {
   constructor(private dao: SupplierDAO) {}
 
-  async findAll(
-    args?: SupplierModule.SupplierFilterInput
-  ): Promise<SupplierModel[]> {
+  async findAll(args?: SupplierFilterInputArgs): Promise<SupplierModel[]> {
     const entities = await this.dao.findAll(args);
 
     return entities.map(
@@ -42,7 +41,7 @@ export class SupplierRepo implements IDAO<SupplierModel> {
     return await this.dao.updateById(id, supplier);
   }
 
-  async save(supplier: SupplierModel): Promise<SupplierModel> {
+  async insert(supplier: SupplierModel): Promise<SupplierModel> {
     const data = supplier.toPersistence();
 
     if (!supplier.id) {
