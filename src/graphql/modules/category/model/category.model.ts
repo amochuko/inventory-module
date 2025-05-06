@@ -1,7 +1,6 @@
 import { createLogger } from "graphql-yoga";
 import { z } from "zod";
-import { ErrorCodes } from "../../../../error/error.codes";
-import ValidationError from "../../../../error/validation.error";
+import ValidationError from "../../../../common/error/validation.error";
 import { Category } from "../../../generated-types/graphql";
 import { BaseModel } from "../../../types/base.model";
 
@@ -38,13 +37,6 @@ const UpdateCategoryArgSchema = z.object({
 });
 
 const CreateCategoryArgSchema = z.object({
-  name: z
-    .string({
-      required_error: "Name must not be empty",
-      invalid_type_error: "Name must be a string",
-    })
-    .trim()
-    .min(2, { message: "Name is required." }),
   description: z
     .string({
       required_error: "Description must not be empty",
@@ -52,6 +44,13 @@ const CreateCategoryArgSchema = z.object({
     })
     .trim()
     .min(1, { message: "Description is required." }),
+  name: z
+    .string({
+      required_error: "Name must not be empty",
+      invalid_type_error: "Name must be a string",
+    })
+    .trim()
+    .min(2, { message: "Name is required." }),
 });
 
 const logger = createLogger("debug");
@@ -68,7 +67,7 @@ export class CategoryModel extends BaseModel<CreateCategoryArgs> {
     private _updatedAt: Date | null
   ) {
     super();
-    this._touch();
+    this.validate();
   }
 
   get id() {
@@ -78,67 +77,31 @@ export class CategoryModel extends BaseModel<CreateCategoryArgs> {
   get name() {
     return this._name;
   }
+
   get description() {
     return this._description;
   }
-  get abbrevCode() {
+
+  get abbrev_code() {
     return this._getAbbrevationCodeFromName(this._name);
   }
+
   get createdAt() {
     return this._createdAt;
   }
+
   get updatedAt() {
     return this._updatedAt;
   }
 
-  validateInsertData() {
-    const validation = CreateCategoryArgSchema.safeParse({
-      name: this.name,
-      description: this.description,
-    });
-
-    if (!validation.success) {
-      const validationErrors = validation.error.format();
-
-      logger.warn(
-        "Validation failed for createCategory args",
-        validationErrors
-      );
-
-      throw new ValidationError("Invalid input for create category", {
-        extensions: {
-          code: ErrorCodes.VALIDATION_ERROR,
-          errors: validationErrors,
-        },
-      });
+  private validate() {
+    if (this._name.trim() === "") {
+      throw new ValidationError("Supplier name cannot be empty.");
     }
 
-    return validation;
-  }
-
-  validateUpdateData() {
-    const validation = CreateCategoryArgSchema.safeParse({
-      name: this.name,
-      description: this.description,
-    });
-
-    if (!validation.success) {
-      const validationErrors = validation.error.format();
-
-      logger.warn(
-        "Validation failed for createCategory args",
-        validationErrors
-      );
-
-      throw new ValidationError("Invalid input for create category", {
-        extensions: {
-          code: ErrorCodes.VALIDATION_ERROR,
-          errors: validationErrors,
-        },
-      });
+    if (this._description.trim() === "") {
+      throw new ValidationError("Supplier description cannot be empty.");
     }
-
-    return validation;
   }
 
   private _getAbbrevationCodeFromName(name: string) {
