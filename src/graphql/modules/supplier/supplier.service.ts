@@ -2,9 +2,8 @@ import { Injectable } from "graphql-modules";
 import ValidationError from "../../../error/validation.error";
 import { SupplierModule } from "./generated-types/module-types";
 import { SupplierModel } from "./model/supplier.model";
-import { CreateSupplierArgs } from "./supplier.dao";
 import { SupplierRepo } from "./supplier.repo";
-import { CreateSupplierSchema } from "./validation/supplier.schema";
+import { CreateSupplierArgs, CreateSupplierSchema } from "./validation/supplier.schema";
 
 @Injectable()
 export class SupplierService {
