@@ -1,10 +1,10 @@
 import { GraphQLError } from "graphql";
-import ValidationError from "../../error/validation.error";
 import {
   CategoryCreationError,
   CategoryNotFoundError,
   DuplicateCategoryError,
 } from "../../graphql/modules/category/category.error";
+import ValidationError from "../error/validation.error";
 
 export class ErrorService {
   static toGraphQLError(err: unknown): GraphQLError {
