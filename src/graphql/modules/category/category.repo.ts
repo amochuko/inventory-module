@@ -1,5 +1,4 @@
 import { Injectable } from "graphql-modules";
-import { FilterCategoryInput } from "../../generated-types/graphql";
 import { IDAO } from "../interface/dao.interface";
 import CategoryDAO from "./category.dao";
 import { CategoryModel } from "./model/category.model";
@@ -17,6 +16,7 @@ export class CategoryRepository implements IDAO<CategoryModel> {
           c.id,
           c.name,
           c.description,
+          c.abbrev_code,
           c.created_at,
           c.updated_at
         )
