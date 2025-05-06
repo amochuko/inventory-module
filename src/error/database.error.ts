@@ -5,7 +5,7 @@ interface DatabaseErrorOptions extends AppErrorOptions {}
 export class DatabaseError extends AppError {
   constructor(
     message = "A database error occcured",
-    options: DatabaseErrorOptions
+    options?: DatabaseErrorOptions
   ) {
     super(message, options);
   }
