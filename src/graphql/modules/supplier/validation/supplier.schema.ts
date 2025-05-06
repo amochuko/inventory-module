@@ -14,4 +14,6 @@ export const SupplierCreateSchema = z.object({
 // SupplierCreateArgs
 export type SupplierCreateArgs = z.infer<typeof SupplierCreateSchema>;
 
+// SupplierIdSchema
+export const SupplierIdSchema = z.string().uuid("Invalid UUID format");
 
