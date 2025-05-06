@@ -1,5 +1,6 @@
 // import { SupplierModule } from "../generated-types/module-types";
 
+import ValidationError from "../../../../error/validation.error";
 import { CreateSupplierInput } from "../../../generated-types/graphql";
 import { CreateSupplierArgs } from "../supplier.dao";
 
@@ -46,12 +47,12 @@ export class SupplierModel {
   }
 
   get updated_at() {
-    return this._createdAt;
+    return this._updatedAt;
   }
 
   updateEmail(newEmail: string) {
-    if (!this.isValidEmail(newEmail)) {
-      throw new Error("Invalid email format.");
+    if (!this.isValidEmail(this._email)) {
+      throw new ValidationError("Invalid email format.");
     }
 
     this._email = newEmail;
@@ -60,7 +61,7 @@ export class SupplierModel {
 
   updatePhone(newPhone: string) {
     if (!/^\d{10,15}$/.test(newPhone)) {
-      throw new Error("Phone must be 10-15 digits.");
+      throw new ValidationError("Phone must be 10-15 digits.");
     }
 
     this._phone = newPhone;
@@ -74,21 +75,16 @@ export class SupplierModel {
 
   private validate() {
     if (!this.isValidEmail(this._email)) {
-      console.error("INVALID_EMAIL: ", this._email);
-      //   throw new Error("Invlaid email.");
+      throw new ValidationError("Invlaid email.");
     }
 
     if (this._name.trim() === "") {
-      throw new Error("Supplier name cannot be empty.");
+      throw new ValidationError("Supplier name cannot be empty.");
     }
   }
 
   private isValidEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  isEmailCorporate(): boolean {
-    return this._email.endsWith("@company.com");
   }
 
   // Factory for new supplier
