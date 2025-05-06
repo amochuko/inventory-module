@@ -8,6 +8,7 @@ import { SupplierRepo } from "./supplier.repo";
 import {
   SupplierCreateArgs,
   SupplierCreateSchema,
+  SupplierFilterSchema,
   SupplierIdSchema,
   SupplierUpdateEmailArgs,
   SupplierUpdateEmailSchema,
@@ -37,30 +38,32 @@ export class SupplierService {
     }
 
     const model = SupplierModel.createFromDTO(validated.data);
-    return await this.repo.save(model);
+    return await this.repo.insert(model);
   }
 
   async findAll(
     args?: SupplierModule.SupplierFilterInput
   ): Promise<SupplierModel[]> {
-    return await this.repo.findAll(args);
-  }
-
-  async findById(id: string): Promise<SupplierModel> {
-    const validation = SupplierIdSchema.safeParse(id);
+    const validation = SupplierFilterSchema.safeParse(args);
 
     if (!validation.success) {
       const validationErrors = validation.error.format();
 
-      logger.warn("Validation failed for findById args", validationErrors);
+      logger.warn("Validation failed for findAll args", validationErrors);
 
-      throw new ValidationError("Invalid UUID", {
+      throw new ValidationError("Invalid filter args", {
         extensions: {
           code: ErrorCodes.VALIDATION_ERROR,
           errors: validationErrors,
         },
       });
     }
+
+    return await this.repo.findAll(validation.data);
+  }
+
+  async findById(id: string): Promise<SupplierModel> {
+    this._validateId(id);
 
     return await this.repo.findById(id);
   }
@@ -84,7 +87,7 @@ export class SupplierService {
     const supplier = await this.findById(validation.data.id); // fetch domain object
     supplier.updateEmail(validation.data.newEmail); // Business logic
 
-    const updated = await this.repo.save(supplier); // Persist changes
+    const updated = await this.repo.insert(supplier); // Persist changes
     return updated;
   }
 
@@ -118,6 +121,25 @@ export class SupplierService {
   }
 
   async deleteById(id: string): Promise<boolean | null> {
+    this._validateId(id);
+
     return await this.repo.deleteById(id);
+  }
+
+  private _validateId(id: string) {
+    const validation = SupplierIdSchema.safeParse(id);
+
+    if (!validation.success) {
+      const validationErrors = validation.error.format();
+
+      logger.warn("Validation failed for findById args", validationErrors);
+
+      throw new ValidationError("Invalid UUID", {
+        extensions: {
+          code: ErrorCodes.VALIDATION_ERROR,
+          errors: validationErrors,
+        },
+      });
+    }
   }
 }
