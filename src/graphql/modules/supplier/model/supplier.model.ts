@@ -51,7 +51,7 @@ export class SupplierModel {
   }
 
   updateEmail(newEmail: string) {
-    if (!this.isValidEmail(this._email)) {
+    if (!this.isValidEmail(newEmail)) {
       throw new ValidationError("Invalid email format.");
     }
 
@@ -65,7 +65,6 @@ export class SupplierModel {
     }
 
     this._phone = newPhone;
-
     this.touch();
   }
 
@@ -75,11 +74,23 @@ export class SupplierModel {
 
   private validate() {
     if (!this.isValidEmail(this._email)) {
-      throw new ValidationError("Invlaid email.");
+      throw new ValidationError(`Invlaid email: ${this._email}`);
     }
 
     if (this._name.trim() === "") {
       throw new ValidationError("Supplier name cannot be empty.");
+    }
+
+    if (this._phone.trim() === "") {
+      throw new ValidationError("Supplier phone number cannot be empty.");
+    }
+
+    if (this._description.trim() === "") {
+      throw new ValidationError("Supplier description cannot be empty.");
+    }
+
+    if (this._address.trim() === "") {
+      throw new ValidationError("Supplier address cannot be empty.");
     }
   }
 
@@ -90,7 +101,7 @@ export class SupplierModel {
   // Factory for new supplier
   static createFromDTO(dto: CreateSupplierInput): SupplierModel {
     return new SupplierModel(
-      "",
+      "", // ID to be assigned by persistence
       dto.name,
       dto.email,
       dto.address,
