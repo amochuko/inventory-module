@@ -1,7 +1,6 @@
 import { Injectable } from "graphql-modules";
-import { createLogger } from "graphql-yoga";
-import { ErrorCodes } from "../../../error/error.codes";
-import ValidationError from "../../../error/validation.error";
+import { ErrorCodes } from "../../../common/error/error.codes";
+import { validateOrThrow } from "../../../common/utils/zod-utils";
 import { SupplierModule } from "./generated-types/module-types";
 import { SupplierModel } from "./model/supplier.model";
 import { SupplierRepo } from "./supplier.repo";
@@ -15,77 +14,52 @@ import {
   SupplierUpdateSchema,
 } from "./validation/supplier.schema";
 
-const logger = createLogger("debug");
-
 @Injectable()
 export class SupplierService {
   constructor(private repo: SupplierRepo) {}
 
   async save(args: SupplierCreateArgs): Promise<SupplierModel> {
     // Validate the incoming DTO before model creation
-    const validated = SupplierCreateSchema.safeParse(args);
-    if (!validated.success) {
-      const validationErrors = validated.error.format();
+    const validated = validateOrThrow({
+      schema: SupplierCreateSchema,
+      input: args,
+      errorMsg: "Validation failed for SupplierCreateArgs",
+      errorCode: ErrorCodes.VALIDATION_ERROR,
+    });
 
-      logger.warn("Validation failed for SupplierCreateArgs", validationErrors);
-
-      throw new ValidationError(`Validation failed`, {
-        extensions: {
-          code: ErrorCodes.VALIDATION_ERROR,
-          errors: validationErrors,
-        },
-      });
-    }
-
-    const model = SupplierModel.createFromDTO(validated.data);
+    const model = SupplierModel.createFromDTO(validated);
     return await this.repo.insert(model);
   }
 
   async findAll(
     args?: SupplierModule.SupplierFilterInput
   ): Promise<SupplierModel[]> {
-    const validation = SupplierFilterSchema.safeParse(args);
+    const validated = validateOrThrow({
+      schema: SupplierFilterSchema,
+      input: args,
+      errorMsg: "Validation failed for findAll args",
+      errorCode: ErrorCodes.VALIDATION_ERROR,
+    });
 
-    if (!validation.success) {
-      const validationErrors = validation.error.format();
-
-      logger.warn("Validation failed for findAll args", validationErrors);
-
-      throw new ValidationError("Invalid filter args", {
-        extensions: {
-          code: ErrorCodes.VALIDATION_ERROR,
-          errors: validationErrors,
-        },
-      });
-    }
-
-    return await this.repo.findAll(validation.data);
+    return await this.repo.findAll(validated);
   }
 
   async findById(id: string): Promise<SupplierModel> {
-    this._validateId(id);
+    id = this._validateId(id);
 
     return await this.repo.findById(id);
   }
 
   async updateEmail(args: SupplierUpdateEmailArgs): Promise<SupplierModel> {
-    const validation = SupplierUpdateEmailSchema.safeParse(args);
+    const validated = validateOrThrow({
+      schema: SupplierUpdateEmailSchema,
+      input: args,
+      errorMsg: "Validation failed for updateEmail args",
+      errorCode: ErrorCodes.VALIDATION_ERROR,
+    });
 
-    if (!validation.success) {
-      const validationErrors = validation.error.format();
-
-      logger.warn("Validation failed for updateEmail args", validationErrors);
-
-      throw new ValidationError("Invalid args", {
-        extensions: {
-          code: ErrorCodes.VALIDATION_ERROR,
-          errors: validationErrors,
-        },
-      });
-    }
-
-    const supplier = await this.findById(validation.data.id); // fetch domain object
-    supplier.updateEmail(validation.data.newEmail); // Business logic
+    const supplier = await this.findById(validated.id); // fetch domain object
+    supplier.updateEmail(validated.newEmail); // Business logic
 
     const updated = await this.repo.insert(supplier); // Persist changes
     return updated;
@@ -95,51 +69,40 @@ export class SupplierService {
     id: string,
     changes: Partial<SupplierModel>
   ): Promise<SupplierModel> {
-    const validation = SupplierUpdateSchema.safeParse(changes);
-    if (!validation.success) {
-      const validationErrors = validation.error.format();
+    id = this._validateId(id);
 
-      logger.warn("Validation failed for updateById args", validationErrors);
-
-      throw new ValidationError("Invalid args", {
-        extensions: {
-          code: ErrorCodes.VALIDATION_ERROR,
-          errors: validationErrors,
-        },
-      });
-    }
+    const validated = validateOrThrow({
+      schema: SupplierUpdateSchema,
+      input: { id, changes },
+      errorMsg: "Validation failed for update args",
+      errorCode: ErrorCodes.VALIDATION_ERROR,
+    });
 
     const supplier = await this.repo.findById(id);
-    supplier.mergeUpdate(validation.data);
+    supplier.mergeUpdate(validated);
 
     const newUpdate = {
       ...supplier.toPersistence(),
-      ...validation.data,
+      ...validated,
     };
 
     return await this.repo.updateById(supplier.id, newUpdate);
   }
 
   async deleteById(id: string): Promise<boolean | null> {
-    this._validateId(id);
+    id = this._validateId(id);
 
     return await this.repo.deleteById(id);
   }
 
   private _validateId(id: string) {
-    const validation = SupplierIdSchema.safeParse(id);
+    const validated = validateOrThrow({
+      schema: SupplierIdSchema,
+      input: id,
+      errorMsg: "Validation failed for id as valid UUID",
+      errorCode: ErrorCodes.VALIDATION_ERROR,
+    });
 
-    if (!validation.success) {
-      const validationErrors = validation.error.format();
-
-      logger.warn("Validation failed for findById args", validationErrors);
-
-      throw new ValidationError("Invalid UUID", {
-        extensions: {
-          code: ErrorCodes.VALIDATION_ERROR,
-          errors: validationErrors,
-        },
-      });
-    }
+    return validated;
   }
 }
