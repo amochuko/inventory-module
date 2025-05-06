@@ -84,10 +84,14 @@ export class CategoryModel extends BaseModel<CategoryCreateArgs> {
     );
   }
 
-  override toPersistence(): CategoryCreateArgs {
+  override toPersistence(): Pick<
+    CategoryModel,
+    "abbrev_code" | "description" | "name"
+  > {
     return {
       name: this._name,
       description: this._description,
+      abbrev_code: this._getAbbrevationCodeFromName(this._name),
     };
   }
 
