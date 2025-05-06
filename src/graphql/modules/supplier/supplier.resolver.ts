@@ -1,5 +1,5 @@
 import { createLogger } from "graphql-yoga";
-import AppError from "../../../error/app.error";
+import AppError from "../../../common/error/app.error";
 import { DateScalar } from "../../types/custom-scalar";
 import { SupplierModule } from "./generated-types/module-types";
 import { SupplierModel } from "./model/supplier.model";
@@ -22,7 +22,7 @@ export const supplierResolver: SupplierModule.Resolvers = {
     createSupplier: async (_, { s_input }, ctx) => {
       logger.info("Resolving create supplier.");
       try {
-        const result = await ctx.injector.get(SupplierService).insert(s_input);
+        const result = await ctx.injector.get(SupplierService).save(s_input);
 
         return {
           code: 200,
@@ -49,7 +49,7 @@ export const supplierResolver: SupplierModule.Resolvers = {
       try {
         const res = await ctx.injector
           .get(SupplierService)
-          .updateById(
+          .update(
             args.s_input.id,
             args.s_input.update_input as Partial<SupplierModel>
           );
