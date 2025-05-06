@@ -8,12 +8,6 @@ import { CreateSupplierArgs, SupplierDAO } from "./supplier.dao";
 export class SupplierRepo implements IDAO<SupplierModel> {
   constructor(private dao: SupplierDAO) {}
 
-  async insert(args: CreateSupplierArgs): Promise<SupplierModel> {
-    const res = await this.dao.insert(args);
-
-    return SupplierModel.rebuildFromPersistence(res);
-  }
-
   async findAll(
     args?: SupplierModule.SupplierFilterInput
   ): Promise<SupplierModel[]> {
