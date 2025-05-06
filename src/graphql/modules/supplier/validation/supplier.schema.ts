@@ -33,3 +33,17 @@ export const SupplierUpdateSchema = SupplierCreateSchema.partial().refine(
 );
 // SupplierUpdateArgs
 export type SupplierUpdateArgs = z.infer<typeof SupplierUpdateSchema>;
+
+// SupplierFilterOptionsSchema
+export const SupplierFilterOptionsSchema = z.object({
+  by: z.enum(["NAME", "EMAIL", "PHONE"]).optional(),
+  skip: z.number().int().min(0).optional(),
+  take: z.number().int().min(1).max(100).optional(),
+  term: z.string().min(2).optional(),
+});
+
+export const SupplierFilterSchema = z.object({
+  filter: SupplierFilterOptionsSchema.optional(),
+});
+
+export type SupplierFilterInputArgs = z.infer<typeof SupplierFilterSchema>;
