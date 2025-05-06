@@ -70,12 +70,16 @@ export class CategoryModel extends BaseModel<CategoryCreateArgs> {
       if (data.name.trim() === "") {
         throw new ValidationError(`Name cannot be empty`);
       }
+
+      this._name = data.name;
     }
 
     if (data.description !== undefined) {
       if (data.description.trim() === "") {
         throw new ValidationError(`Description cannot be empty`);
       }
+
+      this._description = data.description;
     }
 
     this._touch();
