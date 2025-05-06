@@ -1,4 +1,4 @@
-import ValidationError from "../../../../../error/validation.error";
+import ValidationError from "../../../../../common/error/validation.error";
 import { CategoryModel } from "../category.model";
 
 describe("CategoryModel", () => {
@@ -32,30 +32,25 @@ describe("CategoryModel", () => {
   });
 
   it("should return abbrev code", () => {
-    const abbrevCode = model.abbrevCode;
+    const abbrevCode = model.abbrev_code;
     expect(abbrevCode).toBe("ELE-11");
   });
 
-  it("should validate insert input", () => {
-    const validated = model.validateInsertData();
+  it("should update category", () => {
+    model.mergeUpdate({
+      description: "The state of the nationn in Electron 121",
+      name: "Electronics Zippers",
+    });
 
-    expect(validated.data).toEqual(
-      expect.objectContaining({
-        name: "electronics",
-        description: "electronics and gadget",
+    expect(model.name).toEqual(expect.stringContaining("Zippers"));
+  });
+
+  it("should throw when updated with empty name", () => {
+    expect(() =>
+      model.mergeUpdate({
+        description: "The state of the nationn in Electron 121",
+        name: "",
       })
-    );
-  });
-
-  it("should throw if validation fails for insert input", () => {
-    const model = new CategoryModel("12", "", "", new Date(), new Date());
-
-    expect(() => model.validateInsertData()).toThrow(ValidationError);
-  });
-
-  it("should throw if validation fails for update input", () => {
-    const model = new CategoryModel("12", "", "", new Date(), new Date());
-
-    expect(() => model.validateUpdateData()).toThrow(ValidationError);
+    ).toThrow(ValidationError);
   });
 });
