@@ -23,8 +23,9 @@ export class CategoryService {
     return await this.categoryRepo.findAll(args);
   }
 
-  async findById(id: string): Promise<Category> {
-    // TODO: validate args input
+  async findById(id: string): Promise<CategoryModel> {
+    id = this._validateId(id)["id"];
+
     return await this.categoryRepo.findById(id);
   }
 
