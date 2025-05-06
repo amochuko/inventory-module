@@ -10,6 +10,7 @@ export class CategoryModel extends BaseModel<CategoryCreateArgs> {
     private _id: string,
     private _name: string,
     private _description: string,
+    private _abbrev_code: string | null,
     private _createdAt: Date | null,
     private _updatedAt: Date | null
   ) {
@@ -90,7 +91,7 @@ export class CategoryModel extends BaseModel<CategoryCreateArgs> {
   }
 
   static createFromDTO(dto: CategoryCreateArgs): CategoryModel {
-    return new CategoryModel("", dto.name, dto.description, null, null);
+    return new CategoryModel("", dto.name, dto.description, null, null, null);
   }
 
   // Factory for suppliers loaded from DB
@@ -99,6 +100,7 @@ export class CategoryModel extends BaseModel<CategoryCreateArgs> {
       data.id,
       data.name,
       data.description,
+      data.abbrev_code,
       new Date(data.created_at),
       new Date(data.updated_at)
     );
