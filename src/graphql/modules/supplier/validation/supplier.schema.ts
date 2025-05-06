@@ -26,3 +26,10 @@ export const SupplierUpdateEmailSchema = z.object({
 // SupplierUpdateEmailArgs
 export type SupplierUpdateEmailArgs = z.infer<typeof SupplierUpdateEmailSchema>;
 
+// SupplierUpdateSchema
+export const SupplierUpdateSchema = SupplierCreateSchema.partial().refine(
+  (data) => Object.keys(data).length > 0,
+  { message: "At least one field must be provided for update." }
+);
+// SupplierUpdateArgs
+export type SupplierUpdateArgs = z.infer<typeof SupplierUpdateSchema>;
