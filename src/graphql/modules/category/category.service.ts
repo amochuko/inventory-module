@@ -1,17 +1,23 @@
 import { Injectable } from "graphql-modules";
-import { getAbbrevationCodeFromName } from "../../../common/utils/helpers";
+
+import { ErrorCodes } from "../../../common/error/error.codes";
+import { validateOrThrow } from "../../../common/utils/zod-utils";
 import { Category, FilterCategoryInput } from "../../generated-types/graphql";
-import { CategoryCreationError } from "./category.error";
-import { ICategory } from "./category.interface";
 import { CategoryRepository } from "./category.repo";
 import { CategoryModule } from "./generated-types/module-types";
+import { CategoryModel } from "./model/category.model";
+import {
+  CategoryCreateArgs,
+  CategoryCreateArgSchema,
+} from "./validation/category.schema";
 
 @Injectable()
-export class CategoryService implements ICategory {
+export class CategoryService {
   constructor(private readonly categoryRepo: CategoryRepository) {}
 
   async findAll(args?: FilterCategoryInput): Promise<Category[]> {
     // TODO: validate args input
+    // const catModel =
     return await this.categoryRepo.findAll(args);
   }
 
@@ -40,24 +46,16 @@ export class CategoryService implements ICategory {
     return await this.categoryRepo.deleteById(id);
   }
 
-  async create(
-    args: Pick<Category, "name" | "description">
-  ): Promise<Category> {
-    try {
-      // TODD: Add validation logic here
-      const abbrevCode = getAbbrevationCodeFromName(args.name);
-      return await this.categoryRepo.create({
-        ...args,
-        abbrev_code: abbrevCode,
-      });
-    } catch (err) {
-      if (err instanceof CategoryCreationError) {
-        // TODO: option call a centralized ErrorService here
-        throw err.message;
-      }
+  async save(args: CategoryCreateArgs): Promise<CategoryModel> {
+    const validated = validateOrThrow({
+      schema: CategoryCreateArgSchema,
+      input: args,
+      errorMsg: "Validation failed for CategoryCreateArgs",
+      errorCode: ErrorCodes.VALIDATION_ERROR,
+    });
 
-      console.error(CategoryService.name, "Unexpected error in : ", err);
-      throw new Error("Something went wrong while creating the category.");
-    }
+    const model = CategoryModel.createFromDTO(validated);
+
+    return await this.categoryRepo.insert(model);
   }
 }
