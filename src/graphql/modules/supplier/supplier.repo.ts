@@ -1,7 +1,6 @@
 import { Injectable } from "graphql-modules";
-import { DatabaseError } from "../../../error/database.error";
+import { DatabaseError } from "../../../common/error/database.error";
 import { IDAO } from "../interface/dao.interface";
-import { SupplierModule } from "./generated-types/module-types";
 import { SupplierModel } from "./model/supplier.model";
 import { SupplierDAO } from "./supplier.dao";
 import { SupplierFilterInputArgs } from "./validation/supplier.schema";
