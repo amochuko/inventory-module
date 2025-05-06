@@ -37,7 +37,8 @@ export class SupplierRepo implements IDAO<SupplierModel> {
     id: string,
     supplier: Partial<SupplierModel>
   ): Promise<SupplierModel> {
-    return await this.dao.updateById(id, supplier);
+    const result = await this.dao.updateById(id, supplier);
+    return SupplierModel.rebuildFromPersistence(result);
   }
 
   async insert(supplier: SupplierModel): Promise<SupplierModel> {
