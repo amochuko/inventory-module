@@ -23,3 +23,6 @@ export const SupplierUpdateEmailSchema = z.object({
   newEmail: z.string().email("Invalid eamil format"),
 });
 
+// SupplierUpdateEmailArgs
+export type SupplierUpdateEmailArgs = z.infer<typeof SupplierUpdateEmailSchema>;
+
