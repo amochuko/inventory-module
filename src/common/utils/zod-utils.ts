@@ -1,7 +1,7 @@
+import { GraphQLError } from "graphql";
 import { createLogger } from "graphql-yoga";
 import { ZodSchema } from "zod";
 import { ErrorCodes } from "../error/error.codes";
-import ValidationError from "../error/validation.error";
 
 type ValidateOrThrowType<T> = {
   schema: ZodSchema<T>;
@@ -18,7 +18,7 @@ export function validateOrThrow<T>(args: ValidateOrThrowType<T>): T {
 
     logger.warn(args.errorMsg, validationErrors);
 
-    throw new ValidationError(args.errorMsg, {
+    throw new GraphQLError(args.errorMsg, {
       extensions: {
         errors: validationErrors,
         code: args.errorCode,
