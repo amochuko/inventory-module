@@ -1,5 +1,5 @@
 import { sql } from "../../../common/database/sqlConnection";
-import { ErrorCodes } from "../../../error/app.error";
+import { ErrorCodes } from "../../../common/error/error.codes";
 
 export async function simulateServerError(): Promise<void> {
   try {
