@@ -1,6 +1,6 @@
 // import { SupplierModule } from "../generated-types/module-types";
 
-import ValidationError from "../../../../error/validation.error";
+import ValidationError from "../../../../common/error/validation.error";
 import { CreateSupplierInput } from "../../../generated-types/graphql";
 import { CreateSupplierArgs } from "../supplier.dao";
 

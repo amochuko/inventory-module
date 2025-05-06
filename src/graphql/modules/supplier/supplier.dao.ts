@@ -2,10 +2,10 @@ import { Injectable } from "graphql-modules";
 import { createLogger } from "graphql-yoga";
 
 import { sql } from "../../../common/database/sqlConnection";
-import AppError from "../../../error/app.error";
-import { catchErrorHandler } from "../../../error/catchErrorHandler";
-import { ErrorCodes } from "../../../error/error.codes";
-import { NotFoundError } from "../../../error/not-found.error";
+import AppError from "../../../common/error/app.error";
+import { catchErrorHandler } from "../../../common/error/catchErrorHandler";
+import { ErrorCodes } from "../../../common/error/error.codes";
+import { NotFoundError } from "../../../common/error/not-found.error";
 import { Supplier } from "../../generated-types/graphql";
 import { IDAO } from "../interface/dao.interface";
 import { SupplierModel } from "./model/supplier.model";
