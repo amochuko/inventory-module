@@ -1,64 +1,11 @@
 import { createLogger } from "graphql-yoga";
-import { z } from "zod";
 import ValidationError from "../../../../common/error/validation.error";
 import { Category } from "../../../generated-types/graphql";
 import { BaseModel } from "../../../types/base.model";
-
-const DeleteCategoryArgSchema = z.object({
-  id: z.coerce
-    .string()
-    .trim()
-    .regex(/^\d+$/, "Category ID must be numeric string"),
-});
-
-const UpdateCategoryArgSchema = z.object({
-  id: z.coerce
-    .string()
-    .trim()
-    .regex(/^\d+$/, "Category ID must be numeric string"),
-  body: z.object({
-    name: z
-      .string({
-        required_error: "Description must not be empty",
-        invalid_type_error: "Description must be a string",
-      })
-      .trim()
-      .min(2, { message: "Name is required." })
-      .optional(),
-    description: z
-      .string({
-        required_error: "Description must not be empty",
-        invalid_type_error: "Description must be a string",
-      })
-      .trim()
-      .min(1, { message: "Description is required." })
-      .optional(),
-  }),
-});
-
-const CreateCategoryArgSchema = z.object({
-  description: z
-    .string({
-      required_error: "Description must not be empty",
-      invalid_type_error: "Description must be a string",
-    })
-    .trim()
-    .min(1, { message: "Description is required." }),
-  name: z
-    .string({
-      required_error: "Name must not be empty",
-      invalid_type_error: "Name must be a string",
-    })
-    .trim()
-    .min(2, { message: "Name is required." }),
-});
+import { CategoryCreateArgs } from "../validation/category.schema";
 
 const logger = createLogger("debug");
-
-type CreateCategoryInput = z.infer<typeof CreateCategoryArgSchema>;
-type CreateCategoryArgs = CreateCategoryInput;
-
-export class CategoryModel extends BaseModel<CreateCategoryArgs> {
+export class CategoryModel extends BaseModel<CategoryCreateArgs> {
   constructor(
     private _id: string,
     private _name: string,
@@ -122,7 +69,7 @@ export class CategoryModel extends BaseModel<CreateCategoryArgs> {
     this._updatedAt = new Date();
   }
 
-  static createFromDTO(dto: CreateCategoryInput): CategoryModel {
+  static createFromDTO(dto: CategoryCreateArgs): CategoryModel {
     return new CategoryModel("", dto.name, dto.description, null, null);
   }
 
@@ -137,7 +84,7 @@ export class CategoryModel extends BaseModel<CreateCategoryArgs> {
     );
   }
 
-  override toPersistence(): CreateCategoryInput {
+  override toPersistence(): CategoryCreateArgs {
     return {
       name: this._name,
       description: this._description,
