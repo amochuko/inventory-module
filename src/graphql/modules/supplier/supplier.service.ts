@@ -1,17 +1,26 @@
 import { Injectable } from "graphql-modules";
+import ValidationError from "../../../error/validation.error";
 import { SupplierModule } from "./generated-types/module-types";
 import { SupplierModel } from "./model/supplier.model";
 import { CreateSupplierArgs } from "./supplier.dao";
 import { SupplierRepo } from "./supplier.repo";
+import { CreateSupplierSchema } from "./validation/supplier.schema";
 
 @Injectable()
 export class SupplierService {
   constructor(private repo: SupplierRepo) {}
 
-  async insert(args: CreateSupplierArgs): Promise<SupplierModel> {
-    const supplier = SupplierModel.createFromDTO(args);
+  async save(args: CreateSupplierArgs): Promise<SupplierModel> {
+    // Validate the incoming DTO before model creation
+    const validated = CreateSupplierSchema.safeParse(args);
+    if (!validated.success) {
+      throw new ValidationError(
+        `Validation failed: ${validated.error.message}`
+      );
+    }
 
-    return await this.repo.save(supplier);
+    const model = SupplierModel.createFromDTO(validated.data);
+    return await this.repo.save(model);
   }
 
   async findAll(
