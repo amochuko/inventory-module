@@ -20,8 +20,7 @@ export class CategoryService {
   async findAll(
     args?: CategoryModule.FilterCategoryInput
   ): Promise<CategoryModel[]> {
-    // TODO: validate args input
-    // const catModel =
+ 
     const validated = validateOrThrow({
       schema: CategoryFilterSchema,
       input: args,
