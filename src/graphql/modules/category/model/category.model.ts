@@ -65,6 +65,22 @@ export class CategoryModel extends BaseModel<CategoryCreateArgs> {
       : name.substring(0, 3).toUpperCase() + "-" + name.length;
   }
 
+  mergeUpdate(data: Partial<CategoryCreateArgs>) {
+    if (data.name !== undefined) {
+      if (data.name.trim() === "") {
+        throw new ValidationError(`Name cannot be empty`);
+      }
+    }
+
+    if (data.description !== undefined) {
+      if (data.description.trim() === "") {
+        throw new ValidationError(`Description cannot be empty`);
+      }
+    }
+
+    this._touch();
+  }
+
   private _touch() {
     this._updatedAt = new Date();
   }
