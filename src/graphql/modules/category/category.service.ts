@@ -2,13 +2,13 @@ import { Injectable } from "graphql-modules";
 
 import { ErrorCodes } from "../../../common/error/error.codes";
 import { validateOrThrow } from "../../../common/utils/zod-utils";
-import { Category, FilterCategoryInput } from "../../generated-types/graphql";
 import { CategoryRepository } from "./category.repo";
 import { CategoryModule } from "./generated-types/module-types";
 import { CategoryModel } from "./model/category.model";
 import {
   CategoryCreateArgs,
   CategoryCreateArgSchema,
+  CategoryFilterSchema,
   CategoryIdSchema,
   CategoryUpdateArgSchema,
 } from "./validation/category.schema";
@@ -17,10 +17,19 @@ import {
 export class CategoryService {
   constructor(private readonly categoryRepo: CategoryRepository) {}
 
-  async findAll(args?: FilterCategoryInput): Promise<Category[]> {
+  async findAll(
+    args?: CategoryModule.FilterCategoryInput
+  ): Promise<CategoryModel[]> {
     // TODO: validate args input
     // const catModel =
-    return await this.categoryRepo.findAll(args);
+    const validated = validateOrThrow({
+      schema: CategoryFilterSchema,
+      input: args,
+      errorMsg: "Validation failed for findAll filter args",
+      errorCode: ErrorCodes.VALIDATION_ERROR,
+    });
+
+    return await this.categoryRepo.findAll(validated);
   }
 
   async findById(id: string): Promise<CategoryModel> {
