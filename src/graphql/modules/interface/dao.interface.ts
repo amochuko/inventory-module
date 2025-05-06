@@ -5,7 +5,7 @@ type OneOrMany<T> = T | T[];
  * Interface for Data Access Object
  */
 export interface IDAO<T> {
-  insert(args: T): Promise<T>;
+  save(args: T): Promise<T>;
 
   findAll(args?: any): Promise<T[]>;
 
