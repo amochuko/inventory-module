@@ -9,7 +9,7 @@ interface ValidationErrorOptions extends AppErrorOptions {}
 export default class ValidationError extends AppError {
   constructor(
     msg: string = "Invalid data provided",
-    options: ValidationErrorOptions
+    options?: ValidationErrorOptions
   ) {
     super(msg, options);
   }
