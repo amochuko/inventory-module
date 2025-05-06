@@ -17,3 +17,9 @@ export type SupplierCreateArgs = z.infer<typeof SupplierCreateSchema>;
 // SupplierIdSchema
 export const SupplierIdSchema = z.string().uuid("Invalid UUID format");
 
+// SupplierUpdateEmailSchema
+export const SupplierUpdateEmailSchema = z.object({
+  id: z.string().uuid("Invalid UUID format"),
+  newEmail: z.string().email("Invalid eamil format"),
+});
+
