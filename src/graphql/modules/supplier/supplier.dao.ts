@@ -8,8 +8,8 @@ import { ErrorCodes } from "../../../error/error.codes";
 import { NotFoundError } from "../../../error/not-found.error";
 import { Supplier } from "../../generated-types/graphql";
 import { IDAO } from "../interface/dao.interface";
-import { SupplierModule } from "./generated-types/module-types";
 import { SupplierModel } from "./model/supplier.model";
+import { SupplierFilterInputArgs } from "./validation/supplier.schema";
 
 const logger = createLogger("debug");
 
@@ -59,9 +59,7 @@ export class SupplierDAO implements IDAO<SupplierModel> {
     }
   }
 
-  async findAll(
-    args?: SupplierModule.SupplierFilterInput
-  ): Promise<SupplierModel[]> {
+  async findAll(args?: SupplierFilterInputArgs): Promise<SupplierModel[]> {
     logger.info("SupplierDao.findAll: ", { args });
     try {
       const conditions: any[] = [];
