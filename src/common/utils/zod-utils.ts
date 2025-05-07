@@ -10,11 +10,12 @@ type ValidateOrThrowType<T> = {
   errorCode: ErrorCodes;
 };
 export function validateOrThrow<T>(args: ValidateOrThrowType<T>): T {
-  const result = args.schema.safeParse(args.input);
   const logger = createLogger("debug");
 
+  const result = args.schema.safeParse(args.input);
+
   if (!result.success) {
-    const validationErrors = result.error.format();
+    const validationErrors = result.error.flatten();
 
     logger.warn(args.errorMsg, validationErrors);
 
