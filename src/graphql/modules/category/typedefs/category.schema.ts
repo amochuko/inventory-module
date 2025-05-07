@@ -5,17 +5,16 @@ export const categorySchema = gql`
 
   type Query {
     "A list of Categories"
-    categories(filter: FilterCategoryInput): [Category!]!
+    categories(filter: CategoryFilterInput): [Category!]!
     category(id: ID!): Category
   }
 
   type Mutation {
     "Create new category"
-    createCategory(argsObj: CreateCategoryInput!): CategoryMutationResponse!
-    updateCategory(
-      id: ID!
-      body: UpdateCategoryInput!
-    ): CategoryMutationResponse!
+    createCategory(argsObj: CategoryCreateInput!): CategoryMutationResponse!
+    "Update category"
+    updateCategory(args: CategoryUpdateInput!): CategoryMutationResponse!
+    "Delete category"
     deleteCategory(id: ID!): CategoryMutationResponse
   }
 
@@ -27,7 +26,7 @@ export const categorySchema = gql`
   """
   Category Filter Input
   """
-  input FilterCategoryInput {
+  input CategoryFilterInput {
     filterByName: String
     skip: Int
     take: Int
@@ -36,9 +35,22 @@ export const categorySchema = gql`
   """
   Category Add Input
   """
-  input CreateCategoryInput {
+  input CategoryCreateInput {
     name: String!
     description: String!
+  }
+
+  input CategoryUpdateInput {
+    id: ID!
+    changes: CategoryUpdateBodyInput
+  }
+
+  """
+  Category Update Input
+  """
+  input CategoryUpdateBodyInput {
+    name: String
+    description: String
   }
 
   """
@@ -56,15 +68,6 @@ export const categorySchema = gql`
     created_at: Date!
     "Represent the date the category was updated"
     updated_at: Date
-  }
-
-  """
-  Category Update Input
-  """
-  input UpdateCategoryInput {
-    name: String
-    # abbrevCode: String
-    description: String
   }
 
   interface CommonType {
