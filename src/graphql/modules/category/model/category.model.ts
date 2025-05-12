@@ -2,7 +2,7 @@ import { createLogger } from "graphql-yoga";
 import ValidationError from "../../../../common/error/validation.error";
 import { Category } from "../../../generated-types/graphql";
 import { BaseModel } from "../../../types/base.model";
-import { CategoryCreateArgs } from "../validation/category.schema";
+import { CategoryCreateArgs } from "../validation/category.validation";
 
 const logger = createLogger("debug");
 export class CategoryModel extends BaseModel<CategoryCreateArgs> {
@@ -34,11 +34,11 @@ export class CategoryModel extends BaseModel<CategoryCreateArgs> {
     return this._getAbbrevationCodeFromName(this._name);
   }
 
-  get createdAt() {
+  get created_at() {
     return this._createdAt;
   }
 
-  get updatedAt() {
+  get updated_at() {
     return this._updatedAt;
   }
 

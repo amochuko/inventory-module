@@ -9,7 +9,7 @@ import {
   CategoryFindAllError,
   CategoryNotFoundError,
 } from "./category.error";
-import { CategoryFilterArgs } from "./validation/category.schema";
+import { CategoryFilterArgs } from "./validation/category.validation";
 
 const logger = createLogger("error");
 

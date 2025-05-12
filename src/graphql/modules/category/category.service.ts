@@ -11,22 +11,24 @@ import {
   CategoryFilterSchema,
   CategoryIdSchema,
   CategoryUpdateArgSchema,
-} from "./validation/category.schema";
+} from "./validation/category.validation";
 
 @Injectable()
 export class CategoryService {
   constructor(private readonly categoryRepo: CategoryRepository) {}
 
   async findAll(
-    args?: CategoryModule.FilterCategoryInput
+    args?: CategoryModule.CategoryFilterInput
   ): Promise<CategoryModel[]> {
- 
-    const validated = validateOrThrow({
-      schema: CategoryFilterSchema,
-      input: args,
-      errorMsg: "Validation failed for findAll filter args",
-      errorCode: ErrorCodes.VALIDATION_ERROR,
-    });
+    
+    const validated = args
+      ? validateOrThrow({
+          schema: CategoryFilterSchema,
+          input: args,
+          errorMsg: "Validation failed for findAll filter args",
+          errorCode: ErrorCodes.VALIDATION_ERROR,
+        })
+      : {};
 
     return await this.categoryRepo.findAll(validated);
   }
@@ -82,8 +84,8 @@ export class CategoryService {
   private _validateId(id: string) {
     const validated = validateOrThrow({
       schema: CategoryIdSchema,
-      input: id,
-      errorMsg: "Validation failed for id as valid UUID",
+      input: { id },
+      errorMsg: "Validation failed for id",
       errorCode: ErrorCodes.VALIDATION_ERROR,
     });
 

@@ -2,7 +2,7 @@ import { Injectable } from "graphql-modules";
 import { IDAO } from "../interface/dao.interface";
 import CategoryDAO from "./category.dao";
 import { CategoryModel } from "./model/category.model";
-import { CategoryFilterArgs } from "./validation/category.schema";
+import { CategoryFilterArgs } from "./validation/category.validation";
 
 @Injectable()
 export class CategoryRepository implements IDAO<CategoryModel> {
