@@ -27,7 +27,7 @@ export const categorySchema = gql`
   Category Filter Input
   """
   input CategoryFilterInput {
-    filterByName: String
+    byName: String
     skip: Int
     take: Int
   }
