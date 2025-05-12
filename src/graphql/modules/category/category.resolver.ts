@@ -1,45 +1,19 @@
 import { GraphQLError } from "graphql";
 import { createLogger } from "graphql-yoga";
-import { z } from "zod";
 import { DateScalar } from "../../types/custom-scalar";
 import { CategoryService } from "./category.service";
 import { CategoryModule } from "./generated-types/module-types";
 
 const logger = createLogger("debug");
 
-const DeleteCategoryArgSchema = z.object({
-  id: z.coerce
-    .string()
-    .trim()
-    .regex(/^\d+$/, "Category ID must be numeric string"),
-});
-
-const UpdateCategoryArgSchema = z.object({
-  id: z.coerce
-    .string()
-    .trim()
-    .regex(/^\d+$/, "Category ID must be numeric string"),
-  body: z.object({
-    name: z.string().trim().optional(),
-    description: z.string().trim().optional(),
-  }),
-});
-
-const CreateCategoryArgSchema = z.object({
-  name: z.string({ message: "Name is required." }).trim(),
-  description: z.string({ message: "Description is required." }).trim(),
-});
-
 export const categoryResolvers: CategoryModule.Resolvers = {
   Query: {
     categories: async (_, { filter }, ctx) => {
-      logger.info("resolving categories with");
+      logger.info("resolving categories with filter:", filter);
 
-      return await ctx.injector.get(CategoryService).findAll({
-        filterByName: filter?.filterByName,
-        skip: filter?.skip,
-        take: filter?.take,
-      });
+      const res = await ctx.injector.get(CategoryService).findAll(filter!);
+
+      return res;
     },
     category: async (_, args, ctx) => {
       const res = await ctx.injector.get(CategoryService).findById(args.id);
@@ -61,34 +35,10 @@ export const categoryResolvers: CategoryModule.Resolvers = {
   },
   Mutation: {
     createCategory: async (_, { argsObj }, ctx) => {
-      // logger.info(`Attempting to create category:`, argsObj);
-
-      const validation = CreateCategoryArgSchema.safeParse(argsObj);
-      console.log(validation.data);
-
-      if (!validation.success) {
-        const validationErrors = validation.error.format();
-
-        logger.warn(
-          "Validation failed for createCategory args",
-          validationErrors
-        );
-
-        throw new GraphQLError("Invalid input for create category", {
-          extensions: {
-            code: "BAD_USER_INPUT",
-            validationErrors,
-            http: {
-              status: 400,
-            },
-          },
-        });
-      }
+      logger.info(`Attempting to create category:`, argsObj);
 
       try {
-        const res = await ctx.injector
-          .get(CategoryService)
-          .create(validation.data);
+        const res = await ctx.injector.get(CategoryService).save(argsObj);
 
         return {
           success: true,
@@ -110,37 +60,15 @@ export const categoryResolvers: CategoryModule.Resolvers = {
         );
       }
     },
-    updateCategory: async (_, args, ctx) => {
-      logger.info(`Attempting to update category of id '${args.id}`);
-
-      const validation = UpdateCategoryArgSchema.safeParse(args);
-      console.log(validation.data);
-
-      if (!validation.success) {
-        const validationErrors = validation.error.format();
-
-        logger.warn(
-          "Validation failed for updateCategory args",
-          validationErrors
-        );
-
-        throw new GraphQLError("Invalid input for updating category", {
-          extensions: {
-            code: "BAD_USER_INPUT",
-            validationErrors,
-            http: {
-              status: 400,
-            },
-          },
-        });
-      }
+    updateCategory: async (_, { args }, ctx) => {
+      logger.info(`Attempting to update category of id '${args.id}'`);
 
       try {
         const res = await ctx.injector
           .get(CategoryService)
           .updateById(
-            validation.data.id,
-            validation.data.body as Partial<CategoryModule.Category>
+            args.id,
+            args.changes as Partial<CategoryModule.Category>
           );
 
         return {
@@ -163,29 +91,8 @@ export const categoryResolvers: CategoryModule.Resolvers = {
     deleteCategory: async (_, args, ctx) => {
       logger.info(`Attempting to delete category with id: ${args.id}`);
 
-      const validation = DeleteCategoryArgSchema.safeParse(args);
-
-      if (!validation.success) {
-        const validationErrors = validation.error.format();
-
-        logger.warn(
-          "Validation failed for deleteCategory args",
-          validationErrors
-        );
-
-        throw new GraphQLError("Invalid input for deleting category", {
-          extensions: {
-            code: "BAD_USER_INPUT",
-            validationErrors,
-            http: {
-              status: 400,
-            },
-          },
-        });
-      }
-
       try {
-        await ctx.injector.get(CategoryService).deleteById(validation.data.id);
+        await ctx.injector.get(CategoryService).deleteById(args.id);
 
         return {
           success: true,
