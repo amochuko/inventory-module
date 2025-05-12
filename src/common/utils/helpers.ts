@@ -22,20 +22,6 @@ export const applyTakeConstraints = (params: {
   return params.value;
 };
 
-export function getAbbrevationCodeFromName(name: string) {
-  const nameArr = name.split(" ");
-
-  return nameArr.length > 1
-    ? nameArr
-        .map((n) => n.substring(0, 1))
-        .join("")
-        .substring(0, 3)
-        .toUpperCase() +
-        "-" +
-        name.length
-    : name.substring(0, 3).toUpperCase() + "-" + name.length;
-}
-
 export function generateStockKeepingUnit(
   categoryCode: string,
   productName: string,
