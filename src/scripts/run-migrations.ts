@@ -5,20 +5,31 @@ import { DATABASE_URL, sql } from "../common/database/sqlConnection";
 
 const MIGRATION_DIR = "./src/migrations";
 
-function createMigrationTable(filePath: string) {
+async function createMigrationTable(filePath: string) {
   if (!DATABASE_URL) {
     console.error("DATABASE_URL not set!");
     process.exit(1);
   }
 
-  const command = `psql ${DATABASE_URL} -f ${filePath}`;
-  childProcess.execSync(command, {
-    stdio: "inherit",
+  const result = await sql({
+    text: `SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = $1`,
+    params: ["inventory"],
   });
+
+  const includesMigrationsTable = result.rows
+    .map((r) => r.tablename)
+    .includes("migrations");
+
+  if (!includesMigrationsTable) {
+    const command = `psql ${DATABASE_URL} -f ${filePath}`;
+    childProcess.execSync(command, {
+      stdio: "inherit",
+    });
+  }
 }
 
 async function runMigration(filePath: string) {
-  // createMigrationTable(filePath);
+  await createMigrationTable(filePath);
 
   const files = fs
     .readdirSync(path.resolve(MIGRATION_DIR))
@@ -26,6 +37,7 @@ async function runMigration(filePath: string) {
     .slice(1)
     .sort();
 
+  let numOfMigratedFile = 0;
   try {
     for (const file of files) {
       const [name] = file.split(".sql");
@@ -47,9 +59,19 @@ async function runMigration(filePath: string) {
           params: [name],
         });
 
-        console.log(`✅ ${name} was migrated successfully`);
+        console.log(`✅ ${name} was migrated`);
+        numOfMigratedFile++;
       }
     }
+
+    const report =
+      numOfMigratedFile > 0
+        ? `\n${numOfMigratedFile} flle${
+            numOfMigratedFile > 1 && "s"
+          } migrated successfully`
+        : `\nNo new file to migrate.`;
+
+    console.log(report);
   } catch (err) {
     console.error("Error on query: ", err);
   }
