@@ -5,21 +5,37 @@ let pool: pg.Pool;
 
 const nodeEnv = process.env.NODE_ENV;
 
+const testConnStr = env.PGDB_TEST_CONNECTION_STRING;
+const devConnStr = env.PGDB_DEV_CONNECTION_STRING;
+const prodConnStr = env.PGDB_PRO_CONNECTION_STRING;
+
+// console.log({ nodeEnv, testConnStr, devConnStr, prodConnStr });
+
+export let DATABASE_URL: string | undefined;
+
+switch (nodeEnv) {
+  case "test":
+    DATABASE_URL = testConnStr;
+    break;
+
+  case "production":
+    DATABASE_URL = prodConnStr;
+    break;
+
+  default:
+    DATABASE_URL = devConnStr;
+    break;
+}
+
+if (!DATABASE_URL) {
+  console.error("DATABASE_URL not set!");
+  process.exit(1);
+}
+
 export const dbClient = {
   getPool: () => {
-    const testConnStr = env.PGDB_TEST_CONNECTION_STRING;
-    const devConnStr = env.PGDB_DEV_CONNECTION_STRING;
-    const prodConnStr = env.PGDB_PRO_CONNECTION_STRING;
-
     if (!pool) {
-      pool = new pg.Pool({
-        connectionString:
-          nodeEnv === "test"
-            ? testConnStr
-            : nodeEnv === "development"
-            ? devConnStr
-            : prodConnStr,
-      });
+      pool = new pg.Pool({ connectionString: DATABASE_URL });
     }
 
     return pool;
@@ -41,14 +57,14 @@ type SQLArgs = {
 };
 export async function sql<T extends pg.QueryResultRow = any>(args: SQLArgs) {
   const client = await dbClient.getPool().connect();
-  console.log("🔌 Client acquired");
+  console.log("🔌 DBClient connect");
 
   try {
     const result = await client.query<T>(args.text, args.params);
     return result;
   } catch (err) {
-    console.error("❌ Query error:", err);
-    
+    console.error("❌ DBQuery error:", err);
+
     if (err instanceof Error) {
       throw err;
     }
@@ -56,7 +72,7 @@ export async function sql<T extends pg.QueryResultRow = any>(args: SQLArgs) {
     throw new Error(err as any);
   } finally {
     client.release();
-    console.log("✅ Client released");
+    console.log("✅ DBClient released");
   }
 }
 
