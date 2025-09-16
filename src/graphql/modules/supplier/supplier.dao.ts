@@ -61,6 +61,7 @@ export class SupplierDAO implements IDAO<SupplierModel> {
 
   async findAll(args?: SupplierFilterInputArgs): Promise<SupplierModel[]> {
     logger.info("SupplierDao.findAll: ", { args });
+
     try {
       const conditions: any[] = [];
       let params: any[] = [];
@@ -68,19 +69,23 @@ export class SupplierDAO implements IDAO<SupplierModel> {
 
       let text = "SELECT * FROM inventory.suppliers ";
 
-      if (args?.filter?.by && args?.filter?.by === "EMAIL") {
-        conditions.push(`email ILIKE ($${paramIndex++})`);
-        params.push(`${args.filter.term}%`);
-      }
+      if (args?.filter?.by && args?.filter.term) {
+        switch (args.filter.by) {
+          case "EMAIL":
+            conditions.push(`email ILIKE ($${paramIndex++})`);
+            params.push(`${args.filter.term}%`);
+            break;
 
-      if (args?.filter?.by && args?.filter?.by === "NAME") {
-        conditions.push(`name ILIKE ($${paramIndex++})`);
-        params.push(`${args.filter.term}%`);
-      }
+          case "NAME":
+            conditions.push(`name ILIKE ($${paramIndex++})`);
+            params.push(`${args.filter.term}%`);
+            break;
 
-      if (args?.filter?.by && args?.filter?.by === "PHONE") {
-        conditions.push(`phone ILIKE ($${paramIndex++})`);
-        params.push(`${args.filter.term}%`);
+          case "PHONE":
+            conditions.push(`phone ILIKE ($${paramIndex++})`);
+            params.push(`${args.filter.term}%`);
+            break;
+        }
       }
 
       if (conditions.length > 0) {
