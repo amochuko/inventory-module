@@ -16,6 +16,7 @@ import helmet from "helmet";
 import { createContext } from "./context/custom-gql-context";
 import { application } from "./modules/app";
 import { useCSRFPrevention } from "@graphql-yoga/plugin-csrf-prevention";
+import { EnvelopArmorPlugin } from "@escape.tech/graphql-armor";
 
 const logger = createLogger("debug");
 
@@ -54,6 +55,7 @@ const yoga = createYoga({
     return false;
   },
   plugins: [
+    EnvelopArmorPlugin(),
     useGraphQLModules(application),
     useResponseCache({
       session: () => null,
