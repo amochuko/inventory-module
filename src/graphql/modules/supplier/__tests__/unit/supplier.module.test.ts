@@ -5,7 +5,9 @@ describe("Testing supplierModule", () => {
   let app: Application;
 
   beforeEach(() => {
-    app = testkit.testModule(supplierModule, {});
+    app = testkit.testModule(supplierModule, {
+      replaceExtensions: true,
+    });
   });
 
   test("schema is definded", () => {
