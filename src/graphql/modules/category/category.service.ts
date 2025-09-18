@@ -20,7 +20,6 @@ export class CategoryService {
   async findAll(
     args?: CategoryModule.CategoryFilterInput
   ): Promise<CategoryModel[]> {
-    
     const validated = args
       ? validateOrThrow({
           schema: CategoryFilterSchema,
@@ -41,25 +40,28 @@ export class CategoryService {
 
   async updateById(
     id: string,
-    body: Partial<CategoryModule.Category>
+    changes: Pick<CategoryModule.Category, "name" | "description">
   ): Promise<CategoryModel> {
     id = this._validateId(id)["id"];
 
     const validated = validateOrThrow({
       schema: CategoryUpdateArgSchema,
-      input: { id, body },
-      errorMsg: "Validation failed for update args",
+      input: changes,
+      errorMsg: "Validation failed for updateById args",
       errorCode: ErrorCodes.VALIDATION_ERROR,
     });
 
+    console.log({ validated });
+    
     const category = await this.categoryRepo.findById(id);
     category.mergeUpdate(validated!);
-
+    
     const newUpdate = {
       ...category.toPersistence(),
       ...validated,
     };
-
+    
+    console.log({ newUpdate });
     return await this.categoryRepo.updateById(id, newUpdate);
   }
 
