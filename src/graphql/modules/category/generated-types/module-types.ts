@@ -4,28 +4,30 @@ import * as gm from "graphql-modules";
 export namespace CategoryModule {
   interface DefinedFields {
     Query: 'categories' | 'category';
-    Mutation: 'createCategory' | 'updateCategory';
+    Mutation: 'createCategory' | 'updateCategory' | 'deleteCategory';
     Subscription: 'categoryAdded';
-    Category: 'id' | 'name' | 'abbrevCode' | 'description' | 'createdAt' | 'updatedAt';
+    Category: 'id' | 'name' | 'abbrev_code' | 'description' | 'created_at' | 'updated_at';
     CategoryMutationResponse: 'code' | 'success' | 'message' | 'category';
-    CommonType: 'id' | 'createdAt' | 'updatedAt';
+    CommonType: 'id' | 'created_at' | 'updated_at';
     MutationResponse: 'code' | 'success' | 'message';
   };
   
   interface DefinedInputFields {
-    FilterCategoryInput: 'filterNeedle' | 'skip' | 'take';
-    CreateCategoryInput: 'name' | 'description';
-    UpdateCategoryInput: 'name' | 'description';
+    CategoryFilterInput: 'byName' | 'skip' | 'take';
+    CategoryCreateInput: 'name' | 'description';
+    CategoryUpdateInput: 'id' | 'changes';
+    CategoryUpdateBodyInput: 'name' | 'description';
   };
   
   export type Query = Pick<Types.Query, DefinedFields['Query']>;
   export type Category = Pick<Types.Category, DefinedFields['Category']>;
-  export type FilterCategoryInput = Pick<Types.FilterCategoryInput, DefinedInputFields['FilterCategoryInput']>;
+  export type CategoryFilterInput = Pick<Types.CategoryFilterInput, DefinedInputFields['CategoryFilterInput']>;
   export type Mutation = Pick<Types.Mutation, DefinedFields['Mutation']>;
   export type CategoryMutationResponse = Pick<Types.CategoryMutationResponse, DefinedFields['CategoryMutationResponse']>;
-  export type CreateCategoryInput = Pick<Types.CreateCategoryInput, DefinedInputFields['CreateCategoryInput']>;
-  export type UpdateCategoryInput = Pick<Types.UpdateCategoryInput, DefinedInputFields['UpdateCategoryInput']>;
+  export type CategoryCreateInput = Pick<Types.CategoryCreateInput, DefinedInputFields['CategoryCreateInput']>;
+  export type CategoryUpdateInput = Pick<Types.CategoryUpdateInput, DefinedInputFields['CategoryUpdateInput']>;
   export type Subscription = Pick<Types.Subscription, DefinedFields['Subscription']>;
+  export type CategoryUpdateBodyInput = Pick<Types.CategoryUpdateBodyInput, DefinedInputFields['CategoryUpdateBodyInput']>;
   export type CommonType = Pick<Types.CommonType, DefinedFields['CommonType']>;
   export type MutationResponse = Pick<Types.MutationResponse, DefinedFields['MutationResponse']>;
   
@@ -62,6 +64,7 @@ export namespace CategoryModule {
       '*'?: gm.Middleware[];
       createCategory?: gm.Middleware[];
       updateCategory?: gm.Middleware[];
+      deleteCategory?: gm.Middleware[];
     };
     Subscription?: {
       '*'?: gm.Middleware[];
@@ -71,10 +74,10 @@ export namespace CategoryModule {
       '*'?: gm.Middleware[];
       id?: gm.Middleware[];
       name?: gm.Middleware[];
-      abbrevCode?: gm.Middleware[];
+      abbrev_code?: gm.Middleware[];
       description?: gm.Middleware[];
-      createdAt?: gm.Middleware[];
-      updatedAt?: gm.Middleware[];
+      created_at?: gm.Middleware[];
+      updated_at?: gm.Middleware[];
     };
     CategoryMutationResponse?: {
       '*'?: gm.Middleware[];

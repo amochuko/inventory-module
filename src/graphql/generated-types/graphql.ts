@@ -23,16 +23,29 @@ export type Scalars = {
 export type Category = CommonType & {
   __typename?: 'Category';
   /** The code to represent the category */
-  abbrevCode: Scalars['String']['output'];
+  abbrev_code: Scalars['String']['output'];
   /** Represent the date the category was created */
-  createdAt: Scalars['Date']['output'];
+  created_at: Scalars['Date']['output'];
   /** The description of the category */
   description: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   /** The name of the category */
   name: Scalars['String']['output'];
   /** Represent the date the category was updated */
-  updatedAt?: Maybe<Scalars['Date']['output']>;
+  updated_at?: Maybe<Scalars['Date']['output']>;
+};
+
+/** Category Add Input */
+export type CategoryCreateInput = {
+  description: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+};
+
+/** Category Filter Input */
+export type CategoryFilterInput = {
+  byName?: InputMaybe<Scalars['String']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type CategoryMutationResponse = MutationResponse & {
@@ -43,94 +56,94 @@ export type CategoryMutationResponse = MutationResponse & {
   success: Scalars['Boolean']['output'];
 };
 
-export type Comment = {
-  __typename?: 'Comment';
-  body: Scalars['String']['output'];
-  createdAt: Scalars['Date']['output'];
-  id: Scalars['ID']['output'];
-  link: Link;
-  updatedAt?: Maybe<Scalars['Date']['output']>;
+/** Category Update Input */
+export type CategoryUpdateBodyInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CategoryUpdateInput = {
+  changes?: InputMaybe<CategoryUpdateBodyInput>;
+  id: Scalars['ID']['input'];
 };
 
 export type CommonType = {
-  createdAt: Scalars['Date']['output'];
+  created_at: Scalars['Date']['output'];
   id: Scalars['ID']['output'];
-  updatedAt?: Maybe<Scalars['Date']['output']>;
+  updated_at?: Maybe<Scalars['Date']['output']>;
 };
 
-/** Category Add Input */
-export type CreateCategoryInput = {
+/** Supplier: Create Input */
+export type CreateSupplierInput = {
+  address: Scalars['String']['input'];
+  country: Scalars['String']['input'];
   description: Scalars['String']['input'];
+  email: Scalars['String']['input'];
   name: Scalars['String']['input'];
-};
-
-/** Feed Input */
-export type FeedInputArgs = {
-  filterNeedle?: InputMaybe<Scalars['String']['input']>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export type FeedUpdateInputArgs = {
-  description: Scalars['String']['input'];
-  url: Scalars['String']['input'];
-};
-
-/** Category Filter Input */
-export type FilterCategoryInput = {
-  filterNeedle?: InputMaybe<Scalars['String']['input']>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-};
-
-/** Link of the content */
-export type Link = {
-  __typename?: 'Link';
-  comments: Array<Comment>;
-  createdAt: Scalars['Date']['output'];
-  description: Scalars['String']['output'];
-  feed_id: Scalars['ID']['output'];
-  updatedAt?: Maybe<Scalars['Date']['output']>;
-  url: Scalars['String']['output'];
+  phone: Scalars['String']['input'];
+  state: Scalars['String']['input'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   /** Create new category */
   createCategory: CategoryMutationResponse;
-  postCommentOnLink: PostCommentOnLinkMutationResponse;
-  postLink: Link;
+  createProduct: Product;
+  /** Create new supplier */
+  createSupplier: SupplierMutationResponse;
+  /** Delete category */
+  deleteCategory?: Maybe<CategoryMutationResponse>;
+  deleteProduct: UpdateProductMutationResponse;
+  deleteSupplier?: Maybe<SupplierMutationResponse>;
+  /** Update category */
   updateCategory: CategoryMutationResponse;
-  updateLink: UpdateLinkMutationResponse;
+  updateProduct: UpdateProductMutationResponse;
+  updateSupplier: SupplierMutationResponse;
 };
 
 
 export type MutationCreateCategoryArgs = {
-  argsObj: CreateCategoryInput;
+  argsObj: CategoryCreateInput;
 };
 
 
-export type MutationPostCommentOnLinkArgs = {
-  body?: InputMaybe<Scalars['String']['input']>;
-  linkId: Scalars['ID']['input'];
+export type MutationCreateProductArgs = {
+  inputs: ProductInputArgs;
 };
 
 
-export type MutationPostLinkArgs = {
-  description: Scalars['String']['input'];
-  url: Scalars['String']['input'];
+export type MutationCreateSupplierArgs = {
+  s_input: CreateSupplierInput;
+};
+
+
+export type MutationDeleteCategoryArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteProductArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteSupplierArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
 export type MutationUpdateCategoryArgs = {
-  body: UpdateCategoryInput;
-  id: Scalars['ID']['input'];
+  args: CategoryUpdateInput;
 };
 
 
-export type MutationUpdateLinkArgs = {
-  id: Scalars['ID']['input'];
-  link: FeedUpdateInputArgs;
+export type MutationUpdateProductArgs = {
+  inputs: ProductUpdateInputArgs;
+};
+
+
+export type MutationUpdateSupplierArgs = {
+  s_input: UpdateSupplierInput;
 };
 
 export type MutationResponse = {
@@ -142,27 +155,67 @@ export type MutationResponse = {
   success: Scalars['Boolean']['output'];
 };
 
-export type PostCommentOnLinkMutationResponse = MutationResponse & {
-  __typename?: 'PostCommentOnLinkMutationResponse';
-  code: Scalars['Int']['output'];
-  comment: Comment;
-  message: Scalars['String']['output'];
-  success: Scalars['Boolean']['output'];
+/** Product of the content */
+export type Product = {
+  __typename?: 'Product';
+  barcode_number?: Maybe<Scalars['String']['output']>;
+  best_before_date?: Maybe<Scalars['Date']['output']>;
+  category_id: Scalars['ID']['output'];
+  cost_price: Scalars['Float']['output'];
+  created_at: Scalars['Date']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  manufactured_date?: Maybe<Scalars['Date']['output']>;
+  name: Scalars['String']['output'];
+  qrcode?: Maybe<Scalars['String']['output']>;
+  selling_price: Scalars['Float']['output'];
+  stock_keeping_unit: Scalars['String']['output'];
+  stock_quantity: Scalars['Int']['output'];
+  supplier_id: Scalars['ID']['output'];
+  updated_at?: Maybe<Scalars['Date']['output']>;
+};
+
+/** Product Input */
+export type ProductFilterInputArgs = {
+  filterByName?: InputMaybe<Scalars['String']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ProductInputArgs = {
+  barcode_number?: InputMaybe<Scalars['String']['input']>;
+  category_id: Scalars['ID']['input'];
+  cost_price: Scalars['Float']['input'];
+  description: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  qrcode?: InputMaybe<Scalars['String']['input']>;
+  selling_price: Scalars['Float']['input'];
+  stock_keeping_unit: Scalars['String']['input'];
+  stock_quantity: Scalars['Int']['input'];
+  supplier_id: Scalars['ID']['input'];
+};
+
+export type ProductUpdateInputArgs = {
+  id: Scalars['ID']['input'];
+  product: ProductInputArgs;
 };
 
 export type Query = {
   __typename?: 'Query';
   /** A list of Categories */
   categories: Array<Category>;
-  category: Category;
-  comment?: Maybe<Comment>;
-  feed: Array<Link>;
-  link?: Maybe<Link>;
+  category?: Maybe<Category>;
+  product?: Maybe<Product>;
+  products: Array<Product>;
+  /** A Supplier */
+  supplier?: Maybe<Supplier>;
+  /** A list of Supplier */
+  suppliers: Array<Supplier>;
 };
 
 
 export type QueryCategoriesArgs = {
-  filter?: InputMaybe<FilterCategoryInput>;
+  filter?: InputMaybe<CategoryFilterInput>;
 };
 
 
@@ -171,18 +224,18 @@ export type QueryCategoryArgs = {
 };
 
 
-export type QueryCommentArgs = {
+export type QueryProductArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryFeedArgs = {
-  args?: InputMaybe<FeedInputArgs>;
+export type QuerySupplierArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
-export type QueryLinkArgs = {
-  id: Scalars['ID']['input'];
+export type QuerySuppliersArgs = {
+  s_filter_input?: InputMaybe<SupplierFilterInput>;
 };
 
 export type Subscription = {
@@ -190,18 +243,74 @@ export type Subscription = {
   categoryAdded?: Maybe<Category>;
 };
 
-/** Category Update Input */
-export type UpdateCategoryInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
+/** Supplier Entity */
+export type Supplier = {
+  __typename?: 'Supplier';
+  /** The address of the supplier */
+  address: Scalars['String']['output'];
+  /** The country of the supplier */
+  country: Scalars['String']['output'];
+  /** Represent the date the supplier was created */
+  created_at: Scalars['Date']['output'];
+  /** The description of the supplier */
+  description: Scalars['String']['output'];
+  /** The email of the supplier */
+  email: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  /** The name of the supplier */
+  name: Scalars['String']['output'];
+  /** The phone number of the supplier */
+  phone: Scalars['String']['output'];
+  /** The state of the supplier */
+  state: Scalars['String']['output'];
+  /** Represent the date the supplier was updated */
+  updated_at?: Maybe<Scalars['Date']['output']>;
 };
 
-export type UpdateLinkMutationResponse = MutationResponse & {
-  __typename?: 'UpdateLinkMutationResponse';
+export type SupplierFilterEnum =
+  | 'EMAIL'
+  | 'NAME'
+  | 'PHONE';
+
+/** Supplier: Filter Input */
+export type SupplierFilterInput = {
+  filter?: InputMaybe<SupplierFilterOptionsInput>;
+};
+
+export type SupplierFilterOptionsInput = {
+  by?: InputMaybe<SupplierFilterEnum>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+  term?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type SupplierMutationResponse = MutationResponse & {
+  __typename?: 'SupplierMutationResponse';
   code: Scalars['Int']['output'];
-  link?: Maybe<Link>;
   message: Scalars['String']['output'];
   success: Scalars['Boolean']['output'];
+  supplier?: Maybe<Supplier>;
+};
+
+export type UpdateProductMutationResponse = {
+  __typename?: 'UpdateProductMutationResponse';
+  code: Scalars['Int']['output'];
+  message: Scalars['String']['output'];
+  product?: Maybe<Product>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type UpdateSupplier = {
+  address?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateSupplierInput = {
+  id: Scalars['ID']['input'];
+  update_input?: InputMaybe<UpdateSupplier>;
 };
 
 
@@ -275,73 +384,83 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = {
   CommonType: ( Category );
-  MutationResponse: ( CategoryMutationResponse ) | ( PostCommentOnLinkMutationResponse ) | ( UpdateLinkMutationResponse );
+  MutationResponse: ( CategoryMutationResponse ) | ( SupplierMutationResponse );
 };
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Category: ResolverTypeWrapper<Category>;
+  CategoryCreateInput: CategoryCreateInput;
+  CategoryFilterInput: CategoryFilterInput;
   CategoryMutationResponse: ResolverTypeWrapper<CategoryMutationResponse>;
-  Comment: ResolverTypeWrapper<Comment>;
+  CategoryUpdateBodyInput: CategoryUpdateBodyInput;
+  CategoryUpdateInput: CategoryUpdateInput;
   CommonType: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['CommonType']>;
-  CreateCategoryInput: CreateCategoryInput;
+  CreateSupplierInput: CreateSupplierInput;
   Date: ResolverTypeWrapper<Scalars['Date']['output']>;
-  FeedInputArgs: FeedInputArgs;
-  FeedUpdateInputArgs: FeedUpdateInputArgs;
-  FilterCategoryInput: FilterCategoryInput;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
-  Link: ResolverTypeWrapper<Link>;
   Mutation: ResolverTypeWrapper<{}>;
   MutationResponse: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['MutationResponse']>;
-  PostCommentOnLinkMutationResponse: ResolverTypeWrapper<PostCommentOnLinkMutationResponse>;
+  Product: ResolverTypeWrapper<Product>;
+  ProductFilterInputArgs: ProductFilterInputArgs;
+  ProductInputArgs: ProductInputArgs;
+  ProductUpdateInputArgs: ProductUpdateInputArgs;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Subscription: ResolverTypeWrapper<{}>;
-  UpdateCategoryInput: UpdateCategoryInput;
-  UpdateLinkMutationResponse: ResolverTypeWrapper<UpdateLinkMutationResponse>;
+  Supplier: ResolverTypeWrapper<Supplier>;
+  SupplierFilterEnum: SupplierFilterEnum;
+  SupplierFilterInput: SupplierFilterInput;
+  SupplierFilterOptionsInput: SupplierFilterOptionsInput;
+  SupplierMutationResponse: ResolverTypeWrapper<SupplierMutationResponse>;
+  UpdateProductMutationResponse: ResolverTypeWrapper<UpdateProductMutationResponse>;
+  UpdateSupplier: UpdateSupplier;
+  UpdateSupplierInput: UpdateSupplierInput;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   Category: Category;
+  CategoryCreateInput: CategoryCreateInput;
+  CategoryFilterInput: CategoryFilterInput;
   CategoryMutationResponse: CategoryMutationResponse;
-  Comment: Comment;
+  CategoryUpdateBodyInput: CategoryUpdateBodyInput;
+  CategoryUpdateInput: CategoryUpdateInput;
   CommonType: ResolversInterfaceTypes<ResolversParentTypes>['CommonType'];
-  CreateCategoryInput: CreateCategoryInput;
+  CreateSupplierInput: CreateSupplierInput;
   Date: Scalars['Date']['output'];
-  FeedInputArgs: FeedInputArgs;
-  FeedUpdateInputArgs: FeedUpdateInputArgs;
-  FilterCategoryInput: FilterCategoryInput;
+  Float: Scalars['Float']['output'];
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
-  Link: Link;
   Mutation: {};
   MutationResponse: ResolversInterfaceTypes<ResolversParentTypes>['MutationResponse'];
-  PostCommentOnLinkMutationResponse: PostCommentOnLinkMutationResponse;
+  Product: Product;
+  ProductFilterInputArgs: ProductFilterInputArgs;
+  ProductInputArgs: ProductInputArgs;
+  ProductUpdateInputArgs: ProductUpdateInputArgs;
   Query: {};
   String: Scalars['String']['output'];
   Subscription: {};
-  UpdateCategoryInput: UpdateCategoryInput;
-  UpdateLinkMutationResponse: UpdateLinkMutationResponse;
+  Supplier: Supplier;
+  SupplierFilterInput: SupplierFilterInput;
+  SupplierFilterOptionsInput: SupplierFilterOptionsInput;
+  SupplierMutationResponse: SupplierMutationResponse;
+  UpdateProductMutationResponse: UpdateProductMutationResponse;
+  UpdateSupplier: UpdateSupplier;
+  UpdateSupplierInput: UpdateSupplierInput;
 };
-
-export type WithDeprecatedArgsDirectiveArgs = {
-  deprecatedArg?: Maybe<Scalars['String']['input']>;
-  newArg?: Maybe<Scalars['String']['input']>;
-};
-
-export type WithDeprecatedArgsDirectiveResolver<Result, Parent, ContextType = CustomGQLContext, Args = WithDeprecatedArgsDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type CategoryResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category']> = {
-  abbrevCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  abbrev_code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  updatedAt?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -353,75 +472,94 @@ export type CategoryMutationResponseResolvers<ContextType = CustomGQLContext, Pa
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type CommentResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['Comment'] = ResolversParentTypes['Comment']> = {
-  body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  link?: Resolver<ResolversTypes['Link'], ParentType, ContextType>;
-  updatedAt?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
 export type CommonTypeResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['CommonType'] = ResolversParentTypes['CommonType']> = {
   __resolveType: TypeResolveFn<'Category', ParentType, ContextType>;
-  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  updatedAt?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
 };
 
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
   name: 'Date';
 }
 
-export type LinkResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['Link'] = ResolversParentTypes['Link']> = {
-  comments?: Resolver<Array<ResolversTypes['Comment']>, ParentType, ContextType>;
-  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
-  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  feed_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  updatedAt?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
-  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
 export type MutationResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createCategory?: Resolver<ResolversTypes['CategoryMutationResponse'], ParentType, ContextType, RequireFields<MutationCreateCategoryArgs, 'argsObj'>>;
-  postCommentOnLink?: Resolver<ResolversTypes['PostCommentOnLinkMutationResponse'], ParentType, ContextType, RequireFields<MutationPostCommentOnLinkArgs, 'linkId'>>;
-  postLink?: Resolver<ResolversTypes['Link'], ParentType, ContextType, RequireFields<MutationPostLinkArgs, 'description' | 'url'>>;
-  updateCategory?: Resolver<ResolversTypes['CategoryMutationResponse'], ParentType, ContextType, RequireFields<MutationUpdateCategoryArgs, 'body' | 'id'>>;
-  updateLink?: Resolver<ResolversTypes['UpdateLinkMutationResponse'], ParentType, ContextType, RequireFields<MutationUpdateLinkArgs, 'id' | 'link'>>;
+  createProduct?: Resolver<ResolversTypes['Product'], ParentType, ContextType, RequireFields<MutationCreateProductArgs, 'inputs'>>;
+  createSupplier?: Resolver<ResolversTypes['SupplierMutationResponse'], ParentType, ContextType, RequireFields<MutationCreateSupplierArgs, 's_input'>>;
+  deleteCategory?: Resolver<Maybe<ResolversTypes['CategoryMutationResponse']>, ParentType, ContextType, RequireFields<MutationDeleteCategoryArgs, 'id'>>;
+  deleteProduct?: Resolver<ResolversTypes['UpdateProductMutationResponse'], ParentType, ContextType, RequireFields<MutationDeleteProductArgs, 'id'>>;
+  deleteSupplier?: Resolver<Maybe<ResolversTypes['SupplierMutationResponse']>, ParentType, ContextType, RequireFields<MutationDeleteSupplierArgs, 'id'>>;
+  updateCategory?: Resolver<ResolversTypes['CategoryMutationResponse'], ParentType, ContextType, RequireFields<MutationUpdateCategoryArgs, 'args'>>;
+  updateProduct?: Resolver<ResolversTypes['UpdateProductMutationResponse'], ParentType, ContextType, RequireFields<MutationUpdateProductArgs, 'inputs'>>;
+  updateSupplier?: Resolver<ResolversTypes['SupplierMutationResponse'], ParentType, ContextType, RequireFields<MutationUpdateSupplierArgs, 's_input'>>;
 };
 
 export type MutationResponseResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['MutationResponse'] = ResolversParentTypes['MutationResponse']> = {
-  __resolveType: TypeResolveFn<'CategoryMutationResponse' | 'PostCommentOnLinkMutationResponse' | 'UpdateLinkMutationResponse', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'CategoryMutationResponse' | 'SupplierMutationResponse', ParentType, ContextType>;
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 };
 
-export type PostCommentOnLinkMutationResponseResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['PostCommentOnLinkMutationResponse'] = ResolversParentTypes['PostCommentOnLinkMutationResponse']> = {
-  code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  comment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType>;
-  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+export type ProductResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['Product'] = ResolversParentTypes['Product']> = {
+  barcode_number?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  best_before_date?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
+  category_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  cost_price?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  manufactured_date?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  qrcode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  selling_price?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  stock_keeping_unit?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  stock_quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  supplier_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   categories?: Resolver<Array<ResolversTypes['Category']>, ParentType, ContextType, Partial<QueryCategoriesArgs>>;
-  category?: Resolver<ResolversTypes['Category'], ParentType, ContextType, RequireFields<QueryCategoryArgs, 'id'>>;
-  comment?: Resolver<Maybe<ResolversTypes['Comment']>, ParentType, ContextType, RequireFields<QueryCommentArgs, 'id'>>;
-  feed?: Resolver<Array<ResolversTypes['Link']>, ParentType, ContextType, Partial<QueryFeedArgs>>;
-  link?: Resolver<Maybe<ResolversTypes['Link']>, ParentType, ContextType, RequireFields<QueryLinkArgs, 'id'>>;
+  category?: Resolver<Maybe<ResolversTypes['Category']>, ParentType, ContextType, RequireFields<QueryCategoryArgs, 'id'>>;
+  product?: Resolver<Maybe<ResolversTypes['Product']>, ParentType, ContextType, RequireFields<QueryProductArgs, 'id'>>;
+  products?: Resolver<Array<ResolversTypes['Product']>, ParentType, ContextType>;
+  supplier?: Resolver<Maybe<ResolversTypes['Supplier']>, ParentType, ContextType, RequireFields<QuerySupplierArgs, 'id'>>;
+  suppliers?: Resolver<Array<ResolversTypes['Supplier']>, ParentType, ContextType, Partial<QuerySuppliersArgs>>;
 };
 
 export type SubscriptionResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
   categoryAdded?: SubscriptionResolver<Maybe<ResolversTypes['Category']>, "categoryAdded", ParentType, ContextType>;
 };
 
-export type UpdateLinkMutationResponseResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['UpdateLinkMutationResponse'] = ResolversParentTypes['UpdateLinkMutationResponse']> = {
+export type SupplierResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['Supplier'] = ResolversParentTypes['Supplier']> = {
+  address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  country?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  phone?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  state?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SupplierMutationResponseResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['SupplierMutationResponse'] = ResolversParentTypes['SupplierMutationResponse']> = {
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  link?: Resolver<Maybe<ResolversTypes['Link']>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  supplier?: Resolver<Maybe<ResolversTypes['Supplier']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UpdateProductMutationResponseResolvers<ContextType = CustomGQLContext, ParentType extends ResolversParentTypes['UpdateProductMutationResponse'] = ResolversParentTypes['UpdateProductMutationResponse']> = {
+  code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  product?: Resolver<Maybe<ResolversTypes['Product']>, ParentType, ContextType>;
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -429,20 +567,17 @@ export type UpdateLinkMutationResponseResolvers<ContextType = CustomGQLContext, 
 export type Resolvers<ContextType = CustomGQLContext> = {
   Category?: CategoryResolvers<ContextType>;
   CategoryMutationResponse?: CategoryMutationResponseResolvers<ContextType>;
-  Comment?: CommentResolvers<ContextType>;
   CommonType?: CommonTypeResolvers<ContextType>;
   Date?: GraphQLScalarType;
-  Link?: LinkResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   MutationResponse?: MutationResponseResolvers<ContextType>;
-  PostCommentOnLinkMutationResponse?: PostCommentOnLinkMutationResponseResolvers<ContextType>;
+  Product?: ProductResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
-  UpdateLinkMutationResponse?: UpdateLinkMutationResponseResolvers<ContextType>;
+  Supplier?: SupplierResolvers<ContextType>;
+  SupplierMutationResponse?: SupplierMutationResponseResolvers<ContextType>;
+  UpdateProductMutationResponse?: UpdateProductMutationResponseResolvers<ContextType>;
 };
 
-export type DirectiveResolvers<ContextType = CustomGQLContext> = {
-  withDeprecatedArgs?: WithDeprecatedArgsDirectiveResolver<any, any, ContextType>;
-};
 
 export type Date = Scalars["Date"];
