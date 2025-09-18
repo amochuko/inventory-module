@@ -72,7 +72,9 @@ describe("CategoryDAO", () => {
       await dao.insert(mockCategories[1]);
       await dao.insert(mockCategories[2]);
 
-      const res = await dao.findAll({ filterByName: "food", skip: 0, take: 4 });
+      const res = await dao.findAll({
+        filter: { byName: "NAME", skip: 0, take: 4 },
+      });
 
       expect(
         res.map((r) => {

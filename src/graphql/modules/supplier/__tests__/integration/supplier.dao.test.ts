@@ -11,6 +11,8 @@ const suppliers: SupplierModule.Supplier[] = [
     phone: "0913478230",
     description: "Best home made crafters",
     address: "Alan road avenue",
+    country: "Nigeria",
+    state: "Lagos",
     created_at: 1745456019890,
     updated_at: 1745456019890,
   },
@@ -21,6 +23,8 @@ const suppliers: SupplierModule.Supplier[] = [
     phone: "09111223344",
     description: "Best home made crafters",
     address: "Alan road avenue",
+    country: "Nigeria",
+    state: "Lagos",
     created_at: 1745456019890,
     updated_at: 1745456019890,
   },
@@ -60,6 +64,8 @@ describe("SupplierDAO", () => {
         phone: "0913478230",
         description: "Best home made crafters",
         address: "Alan road avenue",
+        country: "Nigeria",
+        state: "Lagos",
       });
 
       await expect(

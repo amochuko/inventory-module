@@ -9,6 +9,7 @@ describe("CategoryModel", () => {
       "12",
       "electronics",
       "electronics and gadget",
+      "cat_ele",
       new Date(),
       new Date()
     );

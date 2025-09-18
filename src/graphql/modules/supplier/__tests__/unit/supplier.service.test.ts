@@ -24,19 +24,21 @@ describe("SupplierService", () => {
       email: "new@email.com",
       name: "jon doe",
       phone: "+2347063113438",
+      country: 'Nigeria',
+      state:'Lagos'
     });
 
     it("should create a supplier", async () => {
-      await service.insert(mockSupplier);
+      await service.save(mockSupplier);
 
-      expect(repo.save).toHaveBeenCalledWith(mockSupplier);
-      expect(repo.save).toHaveBeenCalledTimes(1);
+      expect(repo.insert).toHaveBeenCalledWith(mockSupplier);
+      expect(repo.insert).toHaveBeenCalledTimes(1);
     });
 
     it("should create a supplier and return the data", async () => {
-      repo.save.mockResolvedValue(mockSupplier);
+      repo.insert.mockResolvedValue(mockSupplier);
 
-      const res = await service.insert(mockSupplier);
+      const res = await service.save(mockSupplier);
 
       expect(res).toEqual(mockSupplier);
     });
@@ -76,19 +78,19 @@ describe("SupplierService", () => {
 
     it("should update supplier emai and save it", async () => {
       repo.findById.mockResolvedValue(supplier);
-      repo.save.mockResolvedValue(supplier);
+      repo.insert.mockResolvedValue(supplier);
 
-      const result = await service.updateEmail("123", "new@email.com");
+      const result = await service.updateEmail({id:"123",newEmail: "new@email.com"});
 
       expect(repo.findById).toHaveBeenCalledWith("123");
-      expect(repo.save).toHaveBeenCalledWith(expect.any(SupplierModel));
+      expect(repo.insert).toHaveBeenCalledWith(expect.any(SupplierModel));
       expect(result.email).toBe("new@email.com");
     });
 
     it("should throw if email is invalid", async () => {
       repo.findById.mockResolvedValue(supplier);
 
-      await expect(service.updateEmail("123", "not-an-email")).rejects.toThrow(
+      await expect(service.updateEmail({id:"123", newEmail:"not-an-email"})).rejects.toThrow(
         "Invalid email format."
       );
     });

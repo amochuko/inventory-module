@@ -14,7 +14,7 @@
     "prestart:q": "npm run gql:codegen",
     "predev:q": "npm run gql:codegen",
     "profiler": "NODE_ENV=production node --prof dist/main.js",
-    "lint": "npx eslint . --ext .js,.ts",
+    "lint": "npx eslint .",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
     "migrate:db": "NODE_ENV=development ts-node src/scripts/run-migrations.ts"
   },
