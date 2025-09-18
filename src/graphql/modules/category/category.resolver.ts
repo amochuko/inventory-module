@@ -68,7 +68,10 @@ export const categoryResolvers: CategoryModule.Resolvers = {
           .get(CategoryService)
           .updateById(
             args.id,
-            args.changes as Partial<CategoryModule.Category>
+            args.changes as Pick<
+              CategoryModule.Category,
+              "name" | "description"
+            >
           );
 
         return {
