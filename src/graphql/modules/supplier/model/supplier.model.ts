@@ -7,11 +7,14 @@ import { CreateSupplierArgs } from "../supplier.dao";
 export class SupplierModel {
   constructor(
     private readonly _id: string,
+    private readonly _public_id: string,
     private _name: string,
     private _email: string,
     private _address: string,
     private _description: string,
     private _phone: string,
+    private _state: string,
+    private _country: string,
     private _createdAt: Date | null,
     private _updatedAt: Date | null
   ) {
@@ -20,6 +23,10 @@ export class SupplierModel {
 
   get id(): string {
     return this._id;
+  }
+
+  get public_id(): string {
+    return this._public_id;
   }
 
   get name() {
@@ -50,6 +57,14 @@ export class SupplierModel {
     return this._updatedAt;
   }
 
+  get state() {
+    return this._state;
+  }
+
+  get country() {
+    return this._country;
+  }
+
   updateEmail(newEmail: string) {
     this._updateEmail(newEmail);
 
@@ -68,6 +83,7 @@ export class SupplierModel {
       throw new ValidationError("Phone must be 10-15 digits.");
     }
   }
+
   updatePhone(newPhone: string) {
     this._updatePhone(newPhone);
 
@@ -99,6 +115,14 @@ export class SupplierModel {
     if (this._address.trim() === "") {
       throw new ValidationError("Supplier address cannot be empty.");
     }
+
+    if (this._state.trim() === "") {
+      throw new ValidationError("Supplier state cannot be empty.");
+    }
+
+    if (this._country.trim() === "") {
+      throw new ValidationError("Supplier country cannot be empty.");
+    }
   }
 
   private isValidEmail(email: string): boolean {
@@ -109,11 +133,14 @@ export class SupplierModel {
   static createFromDTO(dto: CreateSupplierInput): SupplierModel {
     return new SupplierModel(
       "", // ID to be assigned by persistence
+      "", // public_id to be assigned by persistence
       dto.name,
       dto.email,
       dto.address,
       dto.description,
       dto.phone,
+      dto.state,
+      dto.country,
       null,
       null
     );
@@ -123,11 +150,14 @@ export class SupplierModel {
   static rebuildFromPersistence(data: any): SupplierModel {
     return new SupplierModel(
       data.id,
+      data.public_id,
       data.name,
       data.email,
       data.address,
       data.description,
       data.phone,
+      data.state,
+      data.country,
       new Date(data.created_at),
       new Date(data.updated_at)
     );
@@ -136,11 +166,14 @@ export class SupplierModel {
   toJson(): Record<string, any> {
     return {
       id: this._id,
+      public_id: this._public_id,
       name: this._name,
       email: this._email,
       address: this._address,
       description: this._description,
       phone: this._phone,
+      statue: this._state,
+      country: this._country,
       createdAt: this._createdAt,
       updateAt: this._updatedAt,
     };
@@ -148,7 +181,7 @@ export class SupplierModel {
 
   toPersistence(): Pick<
     SupplierModel,
-    "name" | "email" | "address" | "description" | "phone"
+    "name" | "email" | "address" | "description" | "phone" | "country" | "state"
   > {
     return {
       name: this._name,
@@ -156,6 +189,8 @@ export class SupplierModel {
       address: this._address,
       description: this._description,
       phone: this._phone,
+      state: this._state,
+      country: this._country,
     };
   }
 
