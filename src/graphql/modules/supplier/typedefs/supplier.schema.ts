@@ -26,6 +26,8 @@ export const supplierSchema = gql`
     address: String!
     email: String!
     phone: String!
+    state: String!
+    country: String!
   }
 
   input UpdateSupplierInput {
@@ -68,6 +70,8 @@ export const supplierSchema = gql`
   """
   type Supplier {
     id: ID!
+    "The id for public"
+    public_id: ID!
     "The name of the supplier"
     name: String!
     "The email of the supplier"
@@ -78,6 +82,13 @@ export const supplierSchema = gql`
     phone: String!
     "The address of the supplier"
     address: String!
+
+    "The state of the supplier"
+    state: String!
+
+    "The country of the supplier"
+    country: String!
+
     "Represent the date the supplier was created"
     created_at: Date!
     "Represent the date the supplier was updated"
