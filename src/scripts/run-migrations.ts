@@ -67,8 +67,8 @@ async function runMigration(filePath: string) {
     const report =
       numOfMigratedFile > 0
         ? `\n${numOfMigratedFile} flle${
-            numOfMigratedFile > 1 && "s"
-          } migrated successfully`
+            numOfMigratedFile > 1 ? "s" : null
+          } migrated successfully `
         : `\nNo new file to migrate.`;
 
     console.log(report);
