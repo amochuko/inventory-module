@@ -21,12 +21,12 @@ export type CreateSupplierArgs = Omit<
 @Injectable()
 export class SupplierDAO implements IDAO<SupplierModel> {
   async insert(args: CreateSupplierArgs): Promise<SupplierModel> {
-    logger.info(SupplierDAO.name, ": insert a supplier");
+    logger.info(SupplierDAO.name, ":insert a supplier");
 
     try {
       const res = await sql({
-        text: `INSERT INTO inventory.suppliers (name, description, email, address, phone)
-                VALUES ($1, $2, $3 , $4, $5)
+        text: `INSERT INTO inventory.suppliers (name, description, email, address, phone,state,country)
+                VALUES ($1, $2, $3 , $4, $5,$6,$7)
                 RETURNING *`,
         params: [
           args.name,
@@ -34,17 +34,22 @@ export class SupplierDAO implements IDAO<SupplierModel> {
           args.email,
           args.address,
           args.phone,
+          args.state,
+          args.country,
         ],
       });
 
       const row = res.rows[0];
       return new SupplierModel(
         row.id,
+        row.public_id,
         row.name,
         row.email,
         row.address,
         row.description,
         row.phone,
+        row.state,
+        row.country,
         new Date(row.created_at),
         new Date(row.updated_at)
       );
@@ -121,13 +126,51 @@ export class SupplierDAO implements IDAO<SupplierModel> {
     }
   }
 
-  async findById(id: string): Promise<SupplierModel> {
+  async _findById(id: string): Promise<SupplierModel> {
     logger.info("SupplierDao.findById: ", { id });
 
     try {
       const res = await sql({
         text: `SELECT * FROM inventory.suppliers 
             WHERE id = ($1)`,
+        params: [id],
+      });
+
+      if (res.rowCount === 0) {
+        throw new NotFoundError(`Supplier with id '${id}' not found.`, {
+          extensions: {
+            code: ErrorCodes.NOT_FOUND,
+            errors: {
+              entity: "Supplier",
+              id,
+            },
+          },
+        });
+      }
+
+      return res.rows[0];
+    } catch (err: any) {
+      logger.error(
+        SupplierDAO.name,
+        `findById failed for supplier id '${id}'`,
+        {
+          error: err,
+          stack: err.stack,
+          context: { entity: "SUPPLIER", operation: "findById" },
+        }
+      );
+
+      throw catchErrorHandler(err, "SUPPLIER");
+    }
+  }
+
+  async findById(id: string): Promise<SupplierModel> {
+    logger.info("SupplierDao.findById: ", { id });
+
+    try {
+      const res = await sql({
+        text: `SELECT * FROM inventory.suppliers 
+            WHERE public_id = ($1)`,
         params: [id],
       });
 
