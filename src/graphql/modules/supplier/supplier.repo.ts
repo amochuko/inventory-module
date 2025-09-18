@@ -15,12 +15,15 @@ export class SupplierRepo implements IDAO<SupplierModel> {
     return entities.map(
       (e) =>
         new SupplierModel(
-          e.id,
+          '',
+          e.public_id,
           e.name,
           e.email,
           e.address,
           e.description,
           e.phone,
+          e.state,
+          e.country,
           e.created_at,
           null
         )
