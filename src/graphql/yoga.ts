@@ -1,5 +1,7 @@
 import { useGraphQLModules } from "@envelop/graphql-modules";
+import { EnvelopArmorPlugin } from "@escape.tech/graphql-armor";
 import { blockFieldSuggestionsPlugin } from "@escape.tech/graphql-armor-block-field-suggestions";
+import { useCSRFPrevention } from "@graphql-yoga/plugin-csrf-prevention";
 import { useDeferStream } from "@graphql-yoga/plugin-defer-stream";
 import { usePrometheus } from "@graphql-yoga/plugin-prometheus";
 import { useResponseCache } from "@graphql-yoga/plugin-response-cache";
@@ -15,8 +17,6 @@ import {
 import helmet from "helmet";
 import { createContext } from "./context/custom-gql-context";
 import { application } from "./modules/app";
-import { useCSRFPrevention } from "@graphql-yoga/plugin-csrf-prevention";
-import { EnvelopArmorPlugin } from "@escape.tech/graphql-armor";
 
 const logger = createLogger("debug");
 
@@ -46,7 +46,7 @@ const yoga = createYoga({
       }
     );
   },
-  graphiql: (request, { req, res }: any) => {
+  graphiql: (request, { req }: any) => {
     // Lock for only 'admin' - access something attached to the request object
     // e.g. a user object added by an auth middleware.
     if (req.user?.role === "admin" || process.env.NODE_ENV !== "production") {
@@ -68,7 +68,7 @@ const yoga = createYoga({
           // await checkDatabaseService(); // check with connection
           return true;
         } catch (err) {
-          console.error(err);
+          console.error('useReadinessCheck:', err);
 
           return false;
         }
