@@ -3,17 +3,21 @@ import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
+import { yoga, yogaRouter } from "../graphql/yoga";
 import { requestTime } from "./middleware";
 import { birdRouter, homeRouter, usersRouter } from "./routers";
-import { yoga, yogaRouter } from "../graphql/yoga";
 
 class App {
   public app: Application;
 
   constructor() {
+    console.log("🚀 Initializing Express app...");
     this.app = express();
+
     this.initMiddleware();
     this.initRoutes();
+
+    console.log("Routes mounted:", this.app._router.stack.length ?? 0);
   }
 
   private initMiddleware() {
@@ -65,13 +69,18 @@ class App {
   private initDB() {}
 
   private initRoutes() {
-    this.app.use('/', homeRouter);
+    console.log("✅ Mounting homeRouter...");
+    this.app.use("/", homeRouter);
 
     this.app.use("/birds", birdRouter);
     this.app.use("/users", usersRouter);
+
+    console.log("✅ Mounting yogaRouter...");
     this.app.use(yoga.graphqlEndpoint, yogaRouter);
 
+    console.log("✅ Mounting 404 fallback...");
     this.app.use((req, res) => {
+      console.log("❌ Hit global 404 handler for:", req.path);
       // 404 response should remain at the very bottom of the stack
       res.status(404).json({ error: "Sorry can't find that!" });
     });
