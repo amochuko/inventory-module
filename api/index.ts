@@ -1,5 +1,5 @@
-import { yoga } from "../src/graphql/yoga";
+import "reflect-metadata"; // load first
+console.log("reflect-metadata loaded");
 import app from "../src/rest/app";
 
-app.use("/graphql", yoga);
 export default app;
