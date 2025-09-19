@@ -65,7 +65,8 @@ class App {
   private initDB() {}
 
   private initRoutes() {
-    this.app.use(homeRouter);
+    this.app.use('/', homeRouter);
+
     this.app.use("/birds", birdRouter);
     this.app.use("/users", usersRouter);
     this.app.use(yoga.graphqlEndpoint, yogaRouter);
