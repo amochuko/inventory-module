@@ -2,11 +2,11 @@
   "name": "inventory",
   "version": "1.0.0",
   "description": "A suit of inventory modules for small businesses",
-  "main": "src/main.ts",
+  "main": "src/main.js",
   "scripts": {
     "clean": "rm -rf ./dist",
     "build": "npm run clean && tsc",
-    "start": "npm run build && node ./dist/main.js",
+    "start": "npm run build && node dist/main.js",
     "dev": "NODE_ENV=development nodemon",
     "test": "jest",
     "test:coverage": "jest --forceExit --coverage --verbose",
@@ -20,6 +20,9 @@
   },
   "author": "Ochuko Awhe <7204868+amochuko@users.noreply.github.com>",
   "license": "MIT",
+  "engines": {
+    "node": "20.x"
+  },
   "dependencies": {
     "@envelop/graphql-modules": "^6.0.0",
     "@escape.tech/graphql-armor": "^3.1.2",
