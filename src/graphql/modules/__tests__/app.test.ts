@@ -1,5 +1,5 @@
-import { testkit } from "graphql-modules";
 import "reflect-metadata";
+import { testkit } from "graphql-modules";
 import { application } from "../app";
 import { productModule } from "../product/product.module";
 
