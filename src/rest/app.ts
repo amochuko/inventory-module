@@ -50,7 +50,8 @@ class App {
         err: NodeJS.ErrnoException,
         req: Request,
         res: Response,
-        next: NextFunction
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+        _next: NextFunction
       ) => {
         // Error handling
         console.error(err.stack || err);
@@ -69,6 +70,10 @@ class App {
   private initDB() {}
 
   private initRoutes() {
+    this.app.get("/health", (req, res) => {
+      res.json({ data: "Server up and running!" });
+    });
+
     console.log("✅ Mounting homeRouter...");
     this.app.use("/", homeRouter);
 
