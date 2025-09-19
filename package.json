@@ -20,6 +20,9 @@
   },
   "author": "Ochuko Awhe <7204868+amochuko@users.noreply.github.com>",
   "license": "MIT",
+  "engines": {
+    "node": "20.x"
+  },
   "dependencies": {
     "@envelop/graphql-modules": "^6.0.0",
     "@escape.tech/graphql-armor": "^3.1.2",
