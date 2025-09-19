@@ -1,6 +1,6 @@
+import "reflect-metadata";
 import http from "node:http";
 import { debug } from "node:util";
-import "reflect-metadata";
 import { yoga } from "./graphql/yoga";
 import app from "./rest/app";
 
